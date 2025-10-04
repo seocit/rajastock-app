@@ -21,8 +21,9 @@ Route::middleware(['auth'])->group(function () {
     
     Volt::route('items', 'superadmin.items.index')->name('items');
     Volt::route('merk', 'superadmin.merk.index')->name('merk');
+    Volt::route('supplier','superadmin.supplier.index')->name('supplier');
+    Volt::route('customer','superadmin.customer.index')->name('customer');
     
-
 
     Route::redirect('settings', 'settings/profile');
 

@@ -18,7 +18,7 @@ class Index extends Component
 
      public function updatingSearch()
     {
-        $this->resetPage(); // <- ini otomatis dipanggil saat $search berubah
+        $this->resetPage(); //biar pagination balik ke halaman 1
     }
 
     #[Computed]
@@ -48,12 +48,11 @@ class Index extends Component
     #[On('item-updated')]
     public function refreshItems()
     {
-        // Kosongkan saja, Livewire otomatis re-render
+        // ini cuman untuk refresh data items
     }
 
     public function edit($id)
     {
-
         Flux::modal('edit-item')->show();
         $this->dispatch('edit-item', $id);
     }

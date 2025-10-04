@@ -1,9 +1,10 @@
+
 <div>
-    <flux:heading size="xl" level="1">Merk</flux:heading>
-    <flux:text size="" class="mt-2">List Merk for Accu product</flux:text>
+    <flux:heading size="xl" level="1">Customer</flux:heading>
+    <flux:text size="" class="mt-2">List Customer </flux:text>
     <flux:separator class="mb-4"></flux:separator>
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        <!-- Search -->
+        <!-- Searchbar -->
 
         <div class="flex w-full">
             <div  wire:model.live.debounce.500ms="search" class="w-full md:w-1/3 mx-2">
@@ -14,11 +15,11 @@
         </div>
         <!-- Add Item Button -->
         <div>
-            <flux:modal.trigger name="create-merk">
-                <flux:button variant="primary" color="blue">Add Merk</flux:button>
+            <flux:modal.trigger name="create-customer">
+                <flux:button variant="primary" color="blue">Add Customer</flux:button>
             </flux:modal.trigger>
-            <livewire:superadmin.merk.create-merk />
-            <livewire:superadmin.merk.edit-merk />
+            <livewire:superadmin.customer.create-customer />
+            <livewire:superadmin.customer.edit-customer />
         </div>
 
     </div>
@@ -31,16 +32,22 @@
                 <tr>
                     <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">#</th>
                     <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Code</th>
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Merk Name</th>                  
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Name</th>                  
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Email </th>                  
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Contact Number</th>                  
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Address</th>                  
                     <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                @forelse ($this->merks as $item)
+                @forelse ($this->customers as $item)
                     <tr>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $loop->index + 1 }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->code }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->merk_name }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->customer_code }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->customer_name }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->email }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->no_contact }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ $item->address }}</td>
                         <td class="px-4 py-2 text-sm">
                             <flux:button wire:click="edit({{ $item->id }})" :loading="true" variant="primary"
                                 size="sm" color="blue">Edit</flux:button>
@@ -57,15 +64,15 @@
             </tbody>
         </table>
         <div class="py-2 px-4">
-            {{ $this->merks->links() }}
+            {{ $this->customers->links() }}
         </div>        
     </div>
     
     {{-- modal confirm --}}
-    <flux:modal name="delete-merk" class="min-w-[22rem]">
+    <flux:modal name="delete-customer" class="min-w-[22rem]">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">Delete Merk?</flux:heading>
+                <flux:heading size="lg">Delete Supplier?</flux:heading>
 
                 <flux:text class="mt-2">
                     <p>You're about to delete this item.</p>
@@ -80,7 +87,7 @@
                     <flux:button variant="ghost">Cancel</flux:button>
                 </flux:modal.close>
 
-                <flux:button type="submit" variant="danger" wire:click="deleteMerk()">Delete</flux:button>
+                <flux:button type="submit" variant="danger" wire:click="deleteCustomer()">Delete</flux:button>
             </div>
         </div>
     </flux:modal>

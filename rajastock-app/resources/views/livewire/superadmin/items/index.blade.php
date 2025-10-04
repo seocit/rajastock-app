@@ -15,7 +15,7 @@
         <!-- Add Item Button -->
         <div>
             <flux:modal.trigger name="create-item">
-                <flux:button variant="primary" color="blue">Create Item</flux:button>
+                <flux:button variant="primary" color="blue">Add Item</flux:button>
             </flux:modal.trigger>
             <livewire:superadmin.items.create-item />
             <livewire:superadmin.items.edit-item />

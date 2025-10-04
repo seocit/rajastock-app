@@ -15,7 +15,7 @@
     <flux:textarea wire:model="description" label="Description" placeholder="Description item ..." />
 
     <x-slot name="footer">
-        <flux:button wire:click="resetForm" type="button" variant="outline" color="gray">Reset</flux:button>
+        <flux:button wire:click="resetForm" type="button" variant="outline" color="gray" class="mx-2">Reset</flux:button>
         <flux:button wire:click="save" type="submit" variant="primary" color="blue">Save</flux:button>
     </x-slot>
 </x-modal>

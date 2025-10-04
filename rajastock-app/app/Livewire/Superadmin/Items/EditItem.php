@@ -61,10 +61,6 @@ class EditItem extends Component
             $item->description = $this->description;
             $item->save();
 
-
-
-
-            // success message
             session()->flash('success', 'Item berhasil diupdate ✅');
             Flux::modal('edit-item')->close();
             $this->dispatch('item-updated');
