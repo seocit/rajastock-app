@@ -24,7 +24,7 @@
 
     </div>
 
-    {{-- add item button --}}
+    
     {{-- table --}}
     <div class="overflow-x-auto bg-white shadow rounded-lg">
         <table class="min-w-full border border-gray-200">

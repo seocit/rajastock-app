@@ -16,4 +16,8 @@ class Supplier extends Model
           'no_contact',
           'email'
         ];
+
+    public function purchases(){
+      return $this->hasMany(Purchases::class);
+    }
 }

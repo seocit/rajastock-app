@@ -52,7 +52,7 @@ class Index extends Component
         session()->flash('success', 'customer successfully deleted ✅');
         Flux::modal('delete-customer')->close();
     }
-
+    
     public function render()
     {
         return view('livewire.superadmin.customer.index');
