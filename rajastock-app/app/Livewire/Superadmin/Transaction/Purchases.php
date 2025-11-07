@@ -28,6 +28,12 @@ class Purchases extends Component
             ->paginate(10);
     }
 
+    public function showDetails($purchaseId)
+    {
+        // kirim event ke modal terpisah
+        $this->dispatch('showPurchaseDetails', purchaseId: $purchaseId);
+    }
+
 
     public function render()
     {

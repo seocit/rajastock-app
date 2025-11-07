@@ -1,6 +1,6 @@
 <div>
-    <flux:heading size="xl" level="1">Transaction | Purchases</flux:heading>
-    <flux:text size="" class="mt-2">purchases list</flux:text>
+    <flux:heading size="xl" level="1">Transaction | Sales</flux:heading>
+    <flux:text size="" class="mt-2">sale list</flux:text>
     <flux:separator class="mb-4"></flux:separator>
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
         <!-- Searchbar -->
@@ -11,12 +11,14 @@
             </div>
             <flux:button icon="funnel">sort</flux:button>
         </div>
+
         <!-- Add Item Button -->
         <div>
-            <flux:button as="a" href="{{ route('create-purchases') }}" variant="primary" color="blue">
+            <flux:button as="a" href="{{ route('create-sale') }}" variant="primary" color="blue">
                 Create Purchase
             </flux:button>
         </div>
+
 
 
     </div>
@@ -26,8 +28,8 @@
             <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                 <tr>
                     <th class="px-4 py-2">#</th>
-                    <th class="px-4 py-2">Purchase Code</th>
-                    <th class="px-4 py-2">Supplier</th>
+                    <th class="px-4 py-2">Sale Code</th>
+                    <th class="px-4 py-2">Customer</th>
                     <th class="px-4 py-2">Date</th>
                     <th class="px-4 py-2">Total</th>
                     {{-- <th class="px-4 py-2">Status</th> --}}
@@ -35,13 +37,13 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($this->purchase as $index => $purchase)
+                @forelse ($this->sales as $index => $sale)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                        <td class="px-4 py-2 font-medium">{{ $purchase->purchase_code }}</td>
-                        <td class="px-4 py-2">{{ $purchase->supplier->supplier_name ?? '-' }}</td>
-                        <td class="px-4 py-2">{{ $purchase->purchase_date }}</td>
-                        <td class="px-4 py-2">Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}</td>
+                        <td class="px-4 py-2 font-medium">{{ $sale->sale_code }}</td>
+                        <td class="px-4 py-2">{{ $sale->customer->customer_name ?? '-' }}</td>
+                        <td class="px-4 py-2">{{ $sale->sale_date }}</td>
+                        <td class="px-4 py-2">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
                         {{-- <td class="px-4 py-2">
                             <span
                                 class="px-2 py-1 rounded-full text-xs
@@ -50,14 +52,14 @@
                             </span>
                         </td> --}}
                         <td class="px-4 py-2 text-center space-x-2">
-                            <flux:button size="sm" color="secondary" wire:click="showDetails({{ $purchase->id }})">
+                            <flux:button size="sm" color="secondary" wire:click="showDetails({{ $sale->id }})">
                                 View
                             </flux:button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-gray-500">No purchases found.</td>
+                        <td colspan="7" class="text-center py-4 text-gray-500">No sales found.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -66,11 +68,8 @@
 
     {{-- Pagination --}}
     <div>
-        {{ $this->purchase->links() }}
+        {{ $this->sales->links() }}
     </div>
 
-    {{-- Modal Component --}}
-    <livewire:superadmin.transaction.detail-purchase />
-
-
+    <livewire:superadmin.transaction.sales-detail />
 </div>

@@ -23,11 +23,14 @@
                     <flux:navlist.item icon="building-office" :href="route('supplier')" :current="request()->routeIs('supplier')" wire:navigate>{{ __('Supplier') }}</flux:navlist.item>
                     <flux:navlist.item icon="users" :href="route('customer')" :current="request()->routeIs('customer')" wire:navigate>{{ __('Customer') }}</flux:navlist.item>
                 </flux:navlist.group>
-                <flux:navlist.group :heading="__('Incoming Stock')" class="grid">
-                    <flux:navlist.item icon="credit-card" :href="route('purchases')" :current="request()->routeIs('purchases')" wire:navigate>{{ __('Faktur Pembelian') }}</flux:navlist.item>
-                    <flux:navlist.item icon="banknotes" :href="route('customer')" :current="request()->routeIs('customer')" wire:navigate>{{ __('Pembayaran Pembelian') }}</flux:navlist.item>
+                <flux:navlist.group :heading="__('Transaction')" class="grid">
+                    <flux:navlist.item icon="shopping-cart" :href="route('purchases')" :current="request()->routeIs('purchases')" wire:navigate>{{ __('Purchases') }}</flux:navlist.item>
+                    <flux:navlist.item icon="shopping-bag" :href="route('sales')" :current="request()->routeIs('sales')" wire:navigate>{{ __('Sales') }}</flux:navlist.item>
                 </flux:navlist.group>
-              
+                <flux:navlist.group :heading="__('Item Returns')" class="grid">
+                    <flux:navlist.item icon="shopping-cart" :href="route('purchase-returns')" :current="request()->routeIs('purchase-returns')" wire:navigate>{{ __('Purchases') }}</flux:navlist.item>
+                    <flux:navlist.item icon="shopping-bag" :href="route('purchase-returns')" :current="request()->routeIs('purchase-returns')" wire:navigate>{{ __('Sales') }}</flux:navlist.item>
+                </flux:navlist.group>        
             </flux:navlist> 
           
 

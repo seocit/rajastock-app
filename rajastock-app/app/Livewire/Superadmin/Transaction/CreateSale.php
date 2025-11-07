@@ -2,27 +2,29 @@
 
 namespace App\Livewire\Superadmin\Transaction;
 
-use App\Models\Item;
-use App\Models\Purchase;
-use App\Models\PurchaseDetail;
-use App\Models\Supplier;
-use Illuminate\Support\Facades\DB as FacadesDB;
 use Livewire\Component;
+use App\Models\Sale;
+use App\Models\SaleDetail;
+use App\Models\Customer;
+use App\Models\Item;
+use Illuminate\Support\Facades\DB;
 
-class CreatePurchases extends Component
+
+class CreateSale extends Component
 {
-    public $suppliers;
+    public $customers;
     public $items;
-    public $supplier_id;
-    public $purchase_date;
+    public $customer_id;
+    public $sale_date;
     public $rows = [];
     public $total = 0;
+    public $description;
 
     public function mount()
     {
-        $this->suppliers = Supplier::all();
+        $this->customers = Customer::all();
         $this->items = Item::all();
-        $this->purchase_date = date('Y-m-d');
+        $this->sale_date = date('Y-m-d');
         $this->addRow(); // start with one empty row
     }
 
@@ -44,7 +46,6 @@ class CreatePurchases extends Component
         $this->calculateTotal();
     }
 
-
     public function refreshTotal()
     {
         foreach ($this->rows as $index => $row) {
@@ -52,9 +53,9 @@ class CreatePurchases extends Component
             $price = $row['unit_price'] ?? 0;
             $discount = $row['discount'] ?? 0;
 
-            // hitung subtotal per item
+            // Hitung subtotal per item
             $subtotal = ($qty * $price) * (1 - ($discount / 100));
-            $this->rows[$index]['subtotal'] = max($subtotal, 0); // jaga-jaga biar gak minus
+            $this->rows[$index]['subtotal'] = max($subtotal, 0);
         }
 
         $this->calculateTotal();
@@ -70,26 +71,26 @@ class CreatePurchases extends Component
     public function save()
     {
         $this->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'purchase_date' => 'required|date',
+            'customer_id' => 'required|exists:customers,id',
+            'sale_date' => 'required|date',
             'rows.*.item_id' => 'required|exists:items,id',
             'rows.*.discount' => 'nullable|numeric|min:0',
             'rows.*.quantity' => 'required|numeric|min:1',
             'rows.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        FacadesDB::transaction(function () {
-            $purchase = Purchase::create([
-                'supplier_id' => $this->supplier_id,
-                'purchase_code' => 'PUR-' . now()->format('YmdHis'),
-                'purchase_date' => $this->purchase_date,
+        DB::transaction(function () {
+            $sale = Sale::create([
+                'sale_code' => 'SAL-' . now()->format('YmdHis'),
+                'customer_id' => $this->customer_id,
+                'sale_date' => $this->sale_date,
+                'description' => $this->description,
                 'total_amount' => $this->total,
-                'status' => 'completed',
             ]);
 
             foreach ($this->rows as $row) {
-                PurchaseDetail::create([
-                    'purchases_id' => $purchase->id,
+                SaleDetail::create([
+                    'sale_id' => $sale->id,
                     'item_id' => $row['item_id'],
                     'quantity' => $row['quantity'],
                     'discount' => $row['discount'] ?? 0,
@@ -97,19 +98,21 @@ class CreatePurchases extends Component
                     'subtotal' => $row['subtotal'],
                 ]);
 
-                // update item stock
+                // Kurangi stok item karena dijual
                 $item = Item::find($row['item_id']);
-                $item->increment('stock', $row['quantity']);
+                $item->decrement('stock', $row['quantity']);
             }
         });
 
-        $this->resetExcept('suppliers', 'items');
-        $this->purchase_date = date('Y-m-d');
+        $this->resetExcept('customers', 'items');
+        $this->sale_date = date('Y-m-d');
         $this->addRow();
-        $this->dispatch('success', message: 'Purchase saved successfully!');
+
+        $this->dispatch('success', message: 'Sale saved successfully!');
     }
+
     public function render()
     {
-        return view('livewire.superadmin.transaction.create-purchases');
+        return view('livewire.superadmin.transaction.create-sale');
     }
 }

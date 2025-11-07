@@ -25,6 +25,12 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('customer','superadmin.customer.index')->name('customer');
     Volt::route('purchases','superadmin.transaction.purchases')->name('purchases');
     Volt::route('create-purchases','superadmin.transaction.create-purchases')->name('create-purchases');
+    Volt::route('sales','superadmin.transaction.sales')->name('sales');
+    Volt::route('create-sale','superadmin.transaction.create-sale')->name('create-sale');
+    // Purchase Return
+    Volt::route('purchase-returns','superadmin.return.index-purchase-return')->name('purchase-returns');
+    Volt::route('purchase-returns/create-return','superadmin.return.create-purchase-return')->name('create-purchase-returns');
+
 
     Route::redirect('settings', 'settings/profile');
 

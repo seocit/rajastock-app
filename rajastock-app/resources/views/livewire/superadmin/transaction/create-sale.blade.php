@@ -1,24 +1,29 @@
 <div>
-    <flux:heading size="xl" level="1">New Purchases</flux:heading>
+    <flux:heading size="xl" level="1">New Sale</flux:heading>
     <flux:separator class="mb-10"></flux:separator>
-    {{-- Supplier & Date --}}
+
+    {{-- Customer & Date --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <flux:select wire:model="supplier_id" label="Supplier" placeholder="Select supplier" searchable>
-            @foreach ($suppliers as $s)
-                <flux:select.option value="{{ $s->id }}">{{ $s->supplier_name }}</flux:select.option>
+        <flux:select wire:model="customer_id" label="Customer" placeholder="-- Select Customer --" searchable>
+            <flux:select.option value="">-- Select Customer --</flux:select.option>
+            @foreach ($customers as $c)
+                <flux:select.option value="{{ $c->id }}">
+                    {{ $c->customer_name }}
+                </flux:select.option>
             @endforeach
         </flux:select>
 
-        <flux:input type="date" wire:model="purchase_date" label="Purchase Date" />
-    </div>
 
+        <flux:input type="date" wire:model="sale_date" label="Sale Date" />
+    </div>
 
     {{-- Item List --}}
     <div class="p-4 space-y-4 border border-gray-200 rounded-2xl shadow-sm bg-white">
         <flux:heading size="lg">Items</flux:heading>
+
         {{-- 🔁 Refresh Total Button --}}
         <flux:button variant="primary" icon="arrow-path" wire:click="refreshTotal">
-            refresh
+            Refresh
         </flux:button>
 
         @foreach ($rows as $index => $row)
@@ -45,10 +50,8 @@
             </div>
         @endforeach
 
-
         <div class="pt-2">
             <flux:button variant="outline" wire:click="addRow">
-
                 Add Item
             </flux:button>
         </div>
@@ -58,8 +61,7 @@
     <div class="flex justify-between items-center mt-4">
         <flux:heading size="lg">Total: Rp {{ number_format($total, 0, ',', '.') }}</flux:heading>
         <flux:button color="primary" wire:click="save">
-
-            Save Purchase
+            Save Sale
         </flux:button>
     </div>
 </div>

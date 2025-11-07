@@ -20,4 +20,15 @@ class Purchase extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+
+    public function details()
+    {
+        return $this->hasMany(PurchaseDetail::class, 'purchases_id');
+    }
+
+    public function returns()
+    {
+        return $this->hasMany(PurchaseReturn::class);
+    }
+
 }
