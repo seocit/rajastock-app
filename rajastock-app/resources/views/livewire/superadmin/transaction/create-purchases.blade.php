@@ -4,6 +4,7 @@
     {{-- Supplier & Date --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <flux:select wire:model="supplier_id" label="Supplier" placeholder="Select supplier" searchable>
+            <flux:select.option value="">-- Select Suppplier --</flux:select.option>
             @foreach ($suppliers as $s)
                 <flux:select.option value="{{ $s->id }}">{{ $s->supplier_name }}</flux:select.option>
             @endforeach

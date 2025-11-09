@@ -29,7 +29,7 @@
                 </flux:navlist.group>
                 <flux:navlist.group :heading="__('Item Returns')" class="grid">
                     <flux:navlist.item icon="shopping-cart" :href="route('purchase-returns')" :current="request()->routeIs('purchase-returns')" wire:navigate>{{ __('Purchases') }}</flux:navlist.item>
-                    <flux:navlist.item icon="shopping-bag" :href="route('purchase-returns')" :current="request()->routeIs('purchase-returns')" wire:navigate>{{ __('Sales') }}</flux:navlist.item>
+                    <flux:navlist.item icon="shopping-bag" :href="route('sale-returns')" :current="request()->routeIs('sale-returns')" wire:navigate>{{ __('Sales') }}</flux:navlist.item>
                 </flux:navlist.group>        
             </flux:navlist> 
           

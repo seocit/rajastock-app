@@ -15,7 +15,7 @@
         <!-- Add Item Button -->
         <div>
             <flux:button as="a" href="{{ route('create-purchase-returns') }}" variant="primary" color="blue">
-                Create Purchase
+                Create Purchase Return
             </flux:button>
         </div>
     </div>
@@ -40,10 +40,11 @@
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $return->return_number }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $return->purchase->purchase_code }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $return->return_date }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">{{ $return->status }}</td>
+                        <td class="px-4 py-2 text-sm capitalize text-gray-600">{{ $return->status }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">
-                            <flux:button size="sm" color="secondary" wire:click="$dispatch('showReturnDetails', { returnId: {{ $return->id }} })"
-                            >
+                            <flux:button size="sm" color="secondary"
+                                wire:click="$dispatch('showReturnDetails', { returnId: {{ $return->id }} })">
+                               
                                 View
                             </flux:button>
                         </td>

@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Livewire\Dashboard\Dashboard;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -8,7 +8,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -30,6 +30,9 @@ Route::middleware(['auth'])->group(function () {
     // Purchase Return
     Volt::route('purchase-returns','superadmin.return.index-purchase-return')->name('purchase-returns');
     Volt::route('purchase-returns/create-return','superadmin.return.create-purchase-return')->name('create-purchase-returns');
+    Volt::route('sale-returns','superadmin.return.index-sale-returns')->name('sale-returns');
+    Volt::route('sale-returns/create-return','superadmin.return.create-sale-returns')->name('create-sale-returns');
+
 
 
     Route::redirect('settings', 'settings/profile');
