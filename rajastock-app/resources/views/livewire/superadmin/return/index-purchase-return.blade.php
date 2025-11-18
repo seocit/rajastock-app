@@ -13,11 +13,13 @@
         </div>
 
         <!-- Add Item Button -->
+        @role('Admin')
         <div>
             <flux:button as="a" href="{{ route('create-purchase-returns') }}" variant="primary" color="blue">
                 Create Purchase Return
             </flux:button>
         </div>
+        @endrole
     </div>
 
     {{-- table --}}

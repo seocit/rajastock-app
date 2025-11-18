@@ -16,7 +16,7 @@ class Index extends Component
     public $search = '';
     public $itemId;
 
-     public function updatingSearch()
+    public function updatingSearch()
     {
         $this->resetPage(); //biar pagination balik ke halaman 1
     }
@@ -48,7 +48,7 @@ class Index extends Component
     #[On('item-updated')]
     public function refreshItems()
     {
-        // ini cuman untuk refresh data items
+        // just refresh data items purpose
     }
 
     public function edit($id)
@@ -74,8 +74,6 @@ class Index extends Component
 
     public function render()
     {
-
-
         return view(
             'livewire.superadmin.items.index'
         );

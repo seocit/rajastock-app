@@ -14,9 +14,11 @@
         </div>
         <!-- Add Item Button -->
         <div>
+            @role('Admin')
             <flux:modal.trigger name="create-item">
                 <flux:button variant="primary" color="blue">Add Item</flux:button>
             </flux:modal.trigger>
+            @endrole
             <livewire:superadmin.items.create-item />
             <livewire:superadmin.items.edit-item />
         </div>
@@ -48,17 +50,19 @@
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->item_code }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->item_name }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->merk->merk_name }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">Rp. {{ $item->price }},-</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">Rp. {{ $item->selling_price }},-</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">Rp. {{ number_format($item->price) }},-</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">Rp. {{ number_format($item->selling_price) }},-</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->minimum_stock }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->stock }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->description }}</td>
+                        @role('Admin')
                         <td class="px-4 py-2 text-sm">
                             <flux:button wire:click="edit({{ $item->id }})" :loading="true" variant="primary"
                                 size="sm" color="blue">Edit</flux:button>
-                            <flux:button wire:click="delete({{ $item->id }})" :loading="false"
+                            <flux:button wire:click="delete({{ $item->id }})" :loading="true"
                                 variant="danger" size="sm">Delete</flux:button>
                         </td>
+                        @endrole
                     </tr>
                 @empty
                     <tr>
@@ -75,7 +79,7 @@
 
 
     {{-- modal confirm --}}
-    <flux:modal name="delete-item" class="min-w-[22rem]">
+    <flux:modal name="delete-item" class="min-w-88">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Delete Item?</flux:heading>

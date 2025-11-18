@@ -4,11 +4,7 @@
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-800">📊 Dashboard Stok Barang</h1>
         <button wire:click="refreshDashboard"
-            class="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0119 5" />
-            </svg>
+            class="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition">           
             Refresh
         </button>
     </div>

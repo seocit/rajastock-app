@@ -1,5 +1,5 @@
 <flux:modal name="purchase-details" wire:model="isOpen" dismissible
-    class="!max-w-none !w-[95vw] md:!w-[80vw] lg:!w-[70vw] !h-[80vh] overflow-y-auto">
+    class="max-w-none! w-[95vw]! md:w-[80vw]! lg:w-[70vw]! h-[80vh]! overflow-y-auto">
     @if ($purchase)
         <div class="space-y-3">
             <flux:heading size="xl" class="mb-6 text-center md:text-left">Purchase Details</flux:heading>

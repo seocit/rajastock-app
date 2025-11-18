@@ -28,7 +28,7 @@
 
         @foreach ($rows as $index => $row)
             <div class="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
-                <flux:select wire:model.live="rows.{{ $index }}.item_id" label="Item" placeholder="Select item"
+                <flux:select wire:model.live="rows.{{ $index }}.item_id" wire:change="refreshUnitPrice({{ $index }})" label="Item" placeholder="Select item"
                     searchable>
                     @foreach ($items as $item)
                         <flux:select.option value="{{ $item->id }}">{{ $item->item_name }}</flux:select.option>

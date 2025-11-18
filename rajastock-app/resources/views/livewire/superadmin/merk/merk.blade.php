@@ -14,9 +14,11 @@
         </div>
         <!-- Add Item Button -->
         <div>
+            @role('Admin')
             <flux:modal.trigger name="create-merk">
                 <flux:button variant="primary" color="blue">Add Merk</flux:button>
             </flux:modal.trigger>
+            @endrole
             <livewire:superadmin.merk.create-merk />
             <livewire:superadmin.merk.edit-merk />
         </div>
@@ -41,12 +43,14 @@
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $loop->index + 1 }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->code }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->merk_name }}</td>
+                        @role('Admin')
                         <td class="px-4 py-2 text-sm">
                             <flux:button wire:click="edit({{ $item->id }})" :loading="true" variant="primary"
                                 size="sm" color="blue">Edit</flux:button>
                             <flux:button wire:click="delete({{ $item->id }})" :loading="false"
                                 variant="danger" size="sm">Delete</flux:button>
                         </td>
+                        @endrole
                     </tr>
                 @empty
                     <tr>

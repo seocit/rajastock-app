@@ -15,9 +15,11 @@
 
         <!-- Add Sales Return Button -->
         <div>
+            @role('Admin')
             <flux:button as="a" href="{{ route('create-sale-returns') }}" variant="primary" color="blue">
                 Create Sales Return
             </flux:button>
+            @endrole
         </div>
     </div>
 

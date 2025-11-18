@@ -68,6 +68,18 @@ class CreateSale extends Component
         $this->total = collect($this->rows)->sum('subtotal');
     }
 
+    public function refreshUnitPrice($index)
+    {
+        $itemId = $this->rows[$index]['item_id'] ?? null;
+
+        if ($itemId) {
+            $item = Item::find($itemId);
+            $this->rows[$index]['unit_price'] = $item->selling_price ?? 0;
+        }
+
+        $this->refreshTotal();
+    }
+
     public function save()
     {
         $this->validate([
