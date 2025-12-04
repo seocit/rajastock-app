@@ -27,7 +27,7 @@
 
     {{-- add item button --}}
     {{-- table --}}
-    <div class="overflow-x-auto bg-white shadow rounded-lg">
+    <div  class="overflow-x-auto bg-white shadow rounded-lg">
         <table class="min-w-max w-full border border-gray-200 border-collapse">
             <thead class="bg-gray-100">
                 <tr>

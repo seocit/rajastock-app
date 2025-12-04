@@ -45,10 +45,15 @@
                         <td class="px-4 py-2 text-sm capitalize text-gray-600">{{ $return->status }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">
                             <flux:button size="sm" color="secondary"
-                                wire:click="$dispatch('showReturnDetails', { returnId: {{ $return->id }} })">
-                               
+                                wire:click="$dispatch('showReturnDetails', { returnId: {{ $return->id }} })">                              
                                 View
                             </flux:button>
+                            @role('Admin')
+                            <flux:button size="sm" color="secondary"
+                                href="{{ route('edit-purchase', $return->id) }}">                              
+                                Edit
+                            </flux:button>
+                            @endrole
                         </td>
                         </tr>
                     @empty

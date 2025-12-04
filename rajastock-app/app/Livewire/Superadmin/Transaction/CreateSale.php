@@ -91,6 +91,18 @@ class CreateSale extends Component
             'rows.*.unit_price' => 'required|numeric|min:0',
         ]);
 
+        // Cek stok sebelum transaksi
+        foreach ($this->rows as $row) {
+            $item = Item::find($row['item_id']);
+
+            if ($item->stock < $row['quantity']) {
+                // Kirim message error ke frontend
+                $this->dispatch('error', message: "Stok {$item->name} hanya {$item->stock}, tidak cukup untuk quantity {$row['quantity']}.");
+                return; // hentikan eksekusi
+            }
+        }
+
+
         DB::transaction(function () {
             $sale = Sale::create([
                 'sale_code' => 'SAL-' . now()->format('YmdHis'),
@@ -101,9 +113,13 @@ class CreateSale extends Component
             ]);
 
             foreach ($this->rows as $row) {
+
+                $item = Item::find($row['item_id']);
                 SaleDetail::create([
                     'sale_id' => $sale->id,
                     'item_id' => $row['item_id'],
+                    'item_name' => $item->item_name,
+                    'item_code' => $item->item_code,
                     'quantity' => $row['quantity'],
                     'discount' => $row['discount'] ?? 0,
                     'unit_price' => $row['unit_price'],
@@ -111,8 +127,8 @@ class CreateSale extends Component
                 ]);
 
                 // Kurangi stok item karena dijual
-                $item = Item::find($row['item_id']);
-                $item->decrement('stock', $row['quantity']);
+                Item::where('id', $row['item_id'])
+                    ->decrement('stock', (int) $row['quantity']);
             }
         });
 

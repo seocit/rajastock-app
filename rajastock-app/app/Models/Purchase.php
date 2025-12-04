@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
+    use Auditable;
     use HasFactory;
 
     protected $fillable = [
@@ -29,6 +31,23 @@ class Purchase extends Model
     public function returns()
     {
         return $this->hasMany(PurchaseReturn::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($purchase) {
+
+            // Kembalikan stok untuk setiap detail yang pernah masuk
+            foreach ($purchase->details as $detail) {
+                $detail->item->stock -= $detail->quantity;
+                $detail->item->save();
+            }
+
+            // Hapus detail-nya
+            $purchase->details()->delete();
+        });
     }
 
 }

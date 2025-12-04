@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseReturn extends Model
 {
+    use Auditable;
     protected $fillable = [
         'return_number',
         'purchase_id',

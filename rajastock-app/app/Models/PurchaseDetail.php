@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseDetail extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'purchases_id',
         'item_id',
+        'item_name',
+        'item_code',
         'quantity',
         'discount',
         'unit_price',

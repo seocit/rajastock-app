@@ -36,6 +36,7 @@
                 <table class="min-w-full text-sm border-collapse">
                     <thead class="bg-gray-100 sticky top-0">
                         <tr>
+                            <th class="p-2 text-left">Item Code</th>
                             <th class="p-2 text-left">Item</th>
                             <th class="p-2 text-right">Qty</th>
                             <th class="p-2 text-right">Unit Price</th>
@@ -46,7 +47,8 @@
                     <tbody>
                         @foreach ($purchase->details as $d)
                             <tr class="border-t hover:bg-gray-50">
-                                <td class="p-2">{{ $d->item->item_name ?? '-' }}</td>
+                                <td class="p-2">{{ $d->item_code ?? '-' }}</td>
+                                <td class="p-2">{{ $d->item_name ?? '-' }}</td>
                                 <td class="p-2 text-right">{{ $d->quantity }}</td>
                                 <td class="p-2 text-right">Rp {{ number_format($d->unit_price, 0, ',', '.') }}</td>
                                 <td class="p-2 text-right">{{ number_format($d->discount ?? 0, 0, ',', '.') }}%</td>

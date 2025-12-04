@@ -40,7 +40,7 @@
                 @forelse ($this->sales as $index => $sale)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                        <td class="px-4 py-2 font-medium">{{ $sale->sale_code }}</td>
+                        <td class="px-4 py-2">{{ $sale->sale_code }}</td>
                         <td class="px-4 py-2">{{ $sale->customer->customer_name ?? '-' }}</td>
                         <td class="px-4 py-2">{{ $sale->sale_date }}</td>
                         <td class="px-4 py-2">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
@@ -55,6 +55,14 @@
                             <flux:button size="sm" color="secondary" wire:click="showDetails({{ $sale->id }})">
                                 View
                             </flux:button>
+                            @role('Admin')
+                                <flux:button size="sm" variant="primary" color="blue" href="{{ route('edit-sale', $sale->id) }}">
+                                    Edit
+                                </flux:button>
+                                <flux:button size="sm" variant="danger" wire:click="delete({{ $sale->id }})">
+                                    Delete
+                                </flux:button>
+                            @endrole
                         </td>
                     </tr>
                 @empty
@@ -72,4 +80,32 @@
     </div>
 
     <livewire:superadmin.transaction.sales-detail />
+
+    {{-- modal konfirmasi delete --}}
+    <flux:modal name="delete-sale" class="min-w-88">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Delete Sale?</flux:heading>
+
+                <flux:text class="mt-2">
+                    <p>You're about to delete this sales record.</p>
+                    <p>All sale details will also be deleted.</p>
+                    <p>This action cannot be reversed.</p>
+                </flux:text>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button variant="danger" wire:click="deleteSale()">
+                    Delete
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
 </div>

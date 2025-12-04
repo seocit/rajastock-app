@@ -88,9 +88,13 @@ class CreatePurchases extends Component
             ]);
 
             foreach ($this->rows as $row) {
+
+                $item = Item::find($row['item_id']);
                 PurchaseDetail::create([
                     'purchases_id' => $purchase->id,
                     'item_id' => $row['item_id'],
+                    'item_name' => $item->item_name,
+                    'item_code' => $item->item_code,
                     'quantity' => $row['quantity'],
                     'discount' => $row['discount'] ?? 0,
                     'unit_price' => $row['unit_price'],
@@ -98,7 +102,7 @@ class CreatePurchases extends Component
                 ]);
 
                 // update item stock
-                $item = Item::find($row['item_id']);
+
                 $item->increment('stock', $row['quantity']);
             }
         });

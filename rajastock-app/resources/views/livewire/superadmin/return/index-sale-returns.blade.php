@@ -16,9 +16,9 @@
         <!-- Add Sales Return Button -->
         <div>
             @role('Admin')
-            <flux:button as="a" href="{{ route('create-sale-returns') }}" variant="primary" color="blue">
-                Create Sales Return
-            </flux:button>
+                <flux:button as="a" href="{{ route('create-sale-returns') }}" variant="primary" color="blue">
+                    Create Sales Return
+                </flux:button>
             @endrole
         </div>
     </div>
@@ -48,9 +48,14 @@
                         <td class="px-4 py-2 text-sm text-gray-600">
                             <flux:button size="sm" color="secondary"
                                 wire:click="$dispatch('showSaleReturnDetails', { returnId: {{ $return->id }} })">
-
                                 View
                             </flux:button>
+                            @role('Admin')
+                            <flux:button as="a" href="{{ route('edit-sale-returns', $return->id) }}" color="secondary"
+                                size="sm">
+                                Edit
+                            </flux:button>
+                            @endrole
                         </td>
                     </tr>
                 @empty

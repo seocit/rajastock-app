@@ -16,6 +16,11 @@ class Index extends Component
     public $search = '';
     public $itemId;
 
+    public function placeholder(){
+        return view('animation.loading-overlay');
+    }
+
+
     public function updatingSearch()
     {
         $this->resetPage(); //biar pagination balik ke halaman 1

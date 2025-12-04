@@ -38,7 +38,7 @@
                 @forelse ($this->purchase as $index => $purchase)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                        <td class="px-4 py-2 font-medium">{{ $purchase->purchase_code }}</td>
+                        <td class="px-4 py-2">{{ $purchase->purchase_code }}</td>
                         <td class="px-4 py-2">{{ $purchase->supplier->supplier_name ?? '-' }}</td>
                         <td class="px-4 py-2">{{ $purchase->purchase_date }}</td>
                         <td class="px-4 py-2">Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}</td>
@@ -53,6 +53,15 @@
                             <flux:button size="sm" color="secondary" wire:click="showDetails({{ $purchase->id }})">
                                 View
                             </flux:button>
+                            @role('Admin')
+                                <flux:button size="sm" variant="primary" color="blue"
+                                    href="{{ route('edit-purchases', $purchase->id) }}">
+                                    Edit
+                                </flux:button>
+                                <flux:button size="sm" variant="danger" wire:click="delete({{ $purchase->id }})">
+                                    Delete
+                                </flux:button>
+                            @endrole
                         </td>
                     </tr>
                 @empty
@@ -71,6 +80,34 @@
 
     {{-- Modal Component --}}
     <livewire:superadmin.transaction.detail-purchase />
+
+    {{-- Deleting confirmation modal --}}
+    <flux:modal name="delete-purchase" class="min-w-88">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Delete Purchase?</flux:heading>
+
+                <flux:text class="mt-2">
+                    <p>You're about to delete this purchase record.</p>
+                    <p>All purchase details will also be deleted.</p>
+                    <p>This action cannot be reversed.</p>
+                </flux:text>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button type="submit" variant="danger" wire:click="deletePurchase()">
+                    Delete
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
 
 
 </div>

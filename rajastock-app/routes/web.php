@@ -23,19 +23,39 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('merk', 'superadmin.merk.index')->name('merk');
     Volt::route('supplier', 'superadmin.supplier.index')->name('supplier');
     Volt::route('customer', 'superadmin.customer.index')->name('customer');
+
+
     // transaction
+
+    // purcahses
     Volt::route('purchases', 'superadmin.transaction.purchases')->name('purchases');
     Volt::route('create-purchases', 'superadmin.transaction.create-purchases')->name('create-purchases');
+    Volt::route('edit-purchases/{id}', 'superadmin.transaction.edit-purchases')->name('edit-purchases');
+    
+    // sales
     Volt::route('sales', 'superadmin.transaction.sales')->name('sales');
     Volt::route('create-sale', 'superadmin.transaction.create-sale')->name('create-sale');
+    Volt::route('edit-sale/{id}', 'superadmin.transaction.edit-sale')->name('edit-sale');
+    
+    // end transaction
+
     // Purchase Return
     Volt::route('purchase-returns', 'superadmin.return.index-purchase-return')->name('purchase-returns');
     Volt::route('purchase-returns/create-return', 'superadmin.return.create-purchase-return')->name('create-purchase-returns');
+    Volt::route('edit-returns/{id}', 'superadmin.return.edit-purchase-return')->name('edit-purchase');
+    
+    // Sale Return
     Volt::route('sale-returns', 'superadmin.return.index-sale-returns')->name('sale-returns');
     Volt::route('sale-returns/create-return', 'superadmin.return.create-sale-returns')->name('create-sale-returns');
+    Volt::route('sale-returns/{id}', 'superadmin.return.edit-sale-return')->name('edit-sale-returns');
+
+
     // User Management
     Volt::route('users', 'superadmin.users.users')->name('users');
     Volt::route('roles', 'superadmin.users.roles')->name('roles');
+
+    // Audit Logs
+    Volt::route('audit-logs', 'superadmin.audit.audit-logs')->name('audit-logs');
 
     // Settings
     Route::redirect('settings', 'settings/profile');
