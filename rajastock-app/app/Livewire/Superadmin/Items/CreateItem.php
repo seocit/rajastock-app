@@ -14,8 +14,8 @@ class CreateItem extends Component
     public $code;
     #[Validate('required|string|max:100')]
     public $name;
-    #[Validate('required|decimal:0,2')]
-    public $price;
+    // #[Validate('required|decimal:0,2')]
+    // public $price;
     #[Validate('required|decimal:0,2')]
     public $sellingPrice;
     #[Validate('required|integer|min:0')]
@@ -43,7 +43,7 @@ class CreateItem extends Component
                 'merk_id'       => $this->merk_id,
                 'item_code'      => $this->code,
                 'item_name'      => $this->name,
-                'price'          => $this->price,
+                // 'price'          => $this->price,
                 'selling_price'  => $this->sellingPrice,
                 'stock'          => $this->stock,
                 'minimum_stock'  => $this->minimumStock,
@@ -54,7 +54,7 @@ class CreateItem extends Component
             $this->reset([
                 'code',
                 'name',
-                'price',
+                // 'price',
                 'sellingPrice',
                 'stock',
                 'minimumStock',
@@ -75,7 +75,7 @@ class CreateItem extends Component
         $this->reset([
                 'code',
                 'name',
-                'price',
+                // 'price',
                 'sellingPrice',
                 'stock',
                 'minimumStock',

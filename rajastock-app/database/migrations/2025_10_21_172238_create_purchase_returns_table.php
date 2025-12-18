@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('purchase_returns', function (Blueprint $table) {
             $table->id();
-            $table->string('return_code')->unique();
+            $table->string('return_number')->unique();
             $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnDelete();
             $table->date('return_date');
-            $table->decimal('total_amount', 15, 2)->default(0);
+            $table->decimal('total_returned_amount', 15, 2)->default(0);
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->text('description')->nullable();
             $table->timestamps();

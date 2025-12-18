@@ -10,12 +10,13 @@
                 <flux:input wire:model.live.debounce.500ms="search" icon="magnifying-glass" placeholder="Search items..."
                     class="w-full" />
             </div>
-            <flux:button icon="funnel">sort</flux:button>
         </div>
-
+        @can('create users')
         <flux:modal.trigger name="create-user">
             <flux:button variant="primary" color="blue">Add User</flux:button>
         </flux:modal.trigger>
+            
+        @endcan
         <livewire:superadmin.users.create-user />
         <livewire:superadmin.users.edit-user />
     </div>
@@ -42,12 +43,15 @@
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $user->email }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $user->getRoleNames()->first() }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $user->created_at->format('d M Y') }}</td>
+                        @can('edit users')
                         <td class="px-4 py-2 text-sm text-gray-600">
                             <flux:button wire:click="edit({{ $user->id }})" :loading="true" variant="primary"
                                 size="sm" color="blue">Edit</flux:button>
                             <flux:button wire:click="delete({{ $user->id }})" :loading="true"
                                 variant="danger" size="sm">Delete</flux:button>
                         </td>
+                            
+                        @endcan
                     </tr>
                 @endforeach
             </tbody>
@@ -65,8 +69,8 @@
                 <flux:heading size="lg">Delete User?</flux:heading>
 
                 <flux:text class="mt-2">
-                    <p>You're about to delete this user.</p>
-                    <p>This action cannot be reversed. To confirm, type <strong>delete</strong> below.</p>
+                    <p>Anda akan menghapus user ini</p>
+                    <p>data tidak bisa dikembalikan. Konfirmasi, ketik <strong>delete</strong> dibawah.</p>
                 </flux:text>
 
                 {{-- Input konfirmasi --}}
@@ -78,14 +82,14 @@
                 <flux:spacer />
 
                 <flux:modal.close>
-                    <flux:button variant="ghost">Cancel</flux:button>
+                    <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
 
                 {{-- Tombol Delete hanya aktif jika confirmText == 'delete' --}}
                 <flux:button type="submit" variant="danger" wire:click="deleteUser"
                     wire:attr.disabled="{{ $confirmText !== 'delete' }}"
                     class="{{ $confirmText !== 'delete' ? 'opacity-50 cursor-not-allowed' : '' }}">
-                    Delete
+                    Ya, Hapus user!
                 </flux:button>
 
             </div>

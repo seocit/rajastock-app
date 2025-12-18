@@ -15,6 +15,8 @@ class PurchaseReturnDetail extends Model
         'sub_total',
         'condition',
         'reason',
+        'item_name',
+        'item_code',
     ];
 
     public function purchaseReturn()

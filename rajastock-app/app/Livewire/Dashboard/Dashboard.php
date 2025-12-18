@@ -15,35 +15,45 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public $chartData = [];
-    public $year; // mudah kalau mau filter tahun
+    public $year;
 
     public function mount()
     {
         $this->year = now()->year;
         $this->loadChartData();
+
+        // trigger chart render ketika page pertama kali diload
+        $this->dispatch('renderChartJS', $this->chartData);
     }
 
     /* ============================================================
-     | 🔹 LOADING WRAPPER (agar bersih)
-     ============================================================ */
-    public function loadChartData()
-    {
-        $this->chartData = $this->getChartData($this->year);
-    }
-
-    /* ============================================================
-     | 🔹 SUMMARY STATS
+     | SUMMARY STATS
      ============================================================ */
     protected function querySummaryStats()
     {
+        // Penjualan bulan ini (qty bersih = qty terjual - qty retur)
+        $salesQtyThisMonth = DB::table('sale_details')
+            ->join('sales', 'sale_details.sale_id', '=', 'sales.id')
+            ->leftJoin('sales_return_details', 'sales_return_details.sales_detail_id', '=', 'sale_details.id')
+            ->whereMonth('sales.sale_date', now()->month)
+            ->selectRaw('SUM(sale_details.quantity - COALESCE(sales_return_details.quantity_returned, 0)) as qty')
+            ->value('qty');
+
+        // Pembelian bulan ini (qty beli)
+        $purchasesQtyThisMonth = DB::table('purchase_details')
+            ->join('purchases', 'purchase_details.purchases_id', '=', 'purchases.id')
+            ->whereMonth('purchases.purchase_date', now()->month)
+            ->sum('purchase_details.quantity');
+
         return [
             'totalItems'         => Item::count(),
             'totalSuppliers'     => Supplier::count(),
             'totalCustomers'     => Customer::count(),
-            'salesThisMonth'     => Sale::whereMonth('sale_date', now()->month)->sum('total_amount'),
-            'purchasesThisMonth' => Purchase::whereMonth('purchase_date', now()->month)->sum('total_amount'),
+            'salesThisMonth'     => $salesQtyThisMonth ?? 0,
+            'purchasesThisMonth' => $purchasesQtyThisMonth ?? 0,
         ];
     }
+
 
     public function getSummaryStats()
     {
@@ -52,15 +62,41 @@ class Dashboard extends Component
 
 
     /* ============================================================
-     | 🔹 CHART DATA
+     | CHART DATA (Penjualan = Qty Bersih)
      ============================================================ */
-    protected function queryMonthlyData($model, $dateField, $year)
+
+    // qty terjual – qty retur
+    protected function queryMonthlySoldNet($year)
     {
-        return $model::selectRaw("MONTH($dateField) as m, SUM(total_amount) as total")
-            ->whereYear($dateField, $year)
+        return DB::table('sale_details')
+            ->join('sales', 'sale_details.sale_id', '=', 'sales.id')
+            ->leftJoin('sales_return_details', 'sales_return_details.sales_detail_id', '=', 'sale_details.id')
+            ->selectRaw("
+            MONTH(sales.sale_date) as m,
+            SUM(
+                sale_details.quantity - COALESCE(sales_return_details.quantity_returned, 0)
+            ) as total
+        ")
+            ->whereYear('sales.sale_date', $year)
             ->groupBy('m')
             ->pluck('total', 'm');
     }
+
+
+    protected function queryMonthlyPurchaseQty($year)
+    {
+        return DB::table('purchase_details')
+            ->join('purchases', 'purchase_details.purchases_id', '=', 'purchases.id')
+            ->selectRaw("
+            MONTH(purchases.purchase_date) as m,
+            SUM(purchase_details.quantity) as total
+        ")
+            ->whereYear('purchases.purchase_date', $year)
+            ->groupBy('m')
+            ->pluck('total', 'm');
+    }
+
+
 
     public function getChartData($year)
     {
@@ -69,80 +105,79 @@ class Dashboard extends Component
             $months = collect(range(1, 12))
                 ->map(fn($m) => Carbon::create()->month($m)->format('M'));
 
-            $sales = $this->queryMonthlyData(Sale::class, 'sale_date', $year);
-            $purchases = $this->queryMonthlyData(Purchase::class, 'purchase_date', $year);
+            $salesNetQty = $this->queryMonthlySoldNet($year);
+            $purchasesQty = $this->queryMonthlyPurchaseQty($year);
+
 
             return $months->map(fn($label, $i) => [
                 'month'     => $label,
-                'sales'     => $sales[$i + 1] ?? 0,
-                'purchases' => $purchases[$i + 1] ?? 0,
+                'sales'     => $salesNetQty[$i + 1] ?? 0,      // qty bersih
+                'purchases' => $purchasesQty[$i + 1] ?? 0,
+                // total amount
             ]);
+        });
+    }
+
+    public function loadChartData()
+    {
+        $this->chartData = $this->getChartData($this->year);
+    }
+
+
+    /* ============================================================
+     | LOW STOCK
+     ============================================================ */
+    public function getLowStockItems()
+    {
+        return Cache::remember('dashboard.lowStock', 60, function () {
+            return Item::whereColumn('stock', '<', 'minimum_stock')
+                ->orderBy('stock')
+                ->limit(5)
+                ->get();
         });
     }
 
 
     /* ============================================================
-     | 🔹 LOW STOCK
+     | TOP SELLING (Qty)
      ============================================================ */
-    protected function queryLowStock()
-    {
-        return Item::whereColumn('stock', '<', 'minimum_stock')
-            ->orderBy('stock')
-            ->limit(5)
-            ->get();
-    }
-
-    public function getLowStockItems()
-    {
-        return Cache::remember('dashboard.lowStock', 60, fn() => $this->queryLowStock());
-    }
-
-
-    /* ============================================================
-     | 🔹 TOP SELLING ITEMS
-     ============================================================ */
-    protected function queryTopSelling()
-    {
-        return DB::table('sale_details')
-            ->join('items', 'sale_details.item_id', '=', 'items.id')
-            ->select('items.item_name', DB::raw('SUM(sale_details.quantity) as total_sold'))
-            ->groupBy('items.item_name')
-            ->orderByDesc('total_sold')
-            ->limit(5)
-            ->get();
-    }
-
     public function getTopSellingItems()
     {
-        return Cache::remember('dashboard.topSelling', 60, fn() => $this->queryTopSelling());
+        return Cache::remember('dashboard.topSelling', 60, function () {
+            return DB::table('sale_details')
+                ->join('items', 'sale_details.item_id', '=', 'items.id')
+                ->select('items.item_name', DB::raw('SUM(sale_details.quantity) as total_sold'))
+                ->groupBy('items.item_name')
+                ->orderByDesc('total_sold')
+                ->limit(5)
+                ->get();
+        });
     }
 
 
     /* ============================================================
-     | 🔹 REFRESH BUTTON
+     | REFRESH BUTTON
      ============================================================ */
     public function refreshDashboard()
     {
         Cache::flush();
 
-        // reload everything
         $this->loadChartData();
 
-        // trigger JS for chart update
         $this->dispatch('refreshChart', $this->chartData);
     }
 
 
     /* ============================================================
-     | 🔹 RENDER VIEW
+     | RENDER VIEW
      ============================================================ */
     public function render()
     {
         return view('livewire.dashboard.dashboard', [
-            'stats'          => $this->getSummaryStats(),
-            'lowStockItems'  => $this->getLowStockItems(),
+            'stats'           => $this->getSummaryStats(),
+            'lowStockItems'   => $this->getLowStockItems(),
             'topSellingItems' => $this->getTopSellingItems(),
-            'chartData'      => $this->chartData,
+            'chartData'       => $this->chartData,
         ]);
     }
 }

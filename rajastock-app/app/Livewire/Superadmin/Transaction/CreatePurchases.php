@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\Purchase;
 use App\Models\PurchaseDetail;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB as FacadesDB;
 use Livewire\Component;
 
@@ -91,6 +92,7 @@ class CreatePurchases extends Component
 
                 $item = Item::find($row['item_id']);
                 PurchaseDetail::create([
+                    'user_id' => Auth::id(),
                     'purchases_id' => $purchase->id,
                     'item_id' => $row['item_id'],
                     'item_name' => $item->item_name,
@@ -99,11 +101,12 @@ class CreatePurchases extends Component
                     'discount' => $row['discount'] ?? 0,
                     'unit_price' => $row['unit_price'],
                     'subtotal' => $row['subtotal'],
+                    'is_posted' => false,
                 ]);
 
-                // update item stock
+               
 
-                $item->increment('stock', $row['quantity']);
+               
             }
         });
 

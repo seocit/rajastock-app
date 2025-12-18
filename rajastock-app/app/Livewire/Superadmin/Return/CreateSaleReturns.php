@@ -105,23 +105,26 @@ class CreateSaleReturns extends Component
             ]);
 
             foreach ($this->selectedItems as $detailId => $item) {
+                $detail = $this->selectedSale->saleDetails->firstWhere('id', $detailId);
                 SalesReturnDetail::create([
                     'sales_return_id' => $return->id,
                     'sales_detail_id' => $detailId,
                     'quantity_returned' => $item['quantity_returned'],
                     'sub_total' => $item['sub_total'],
                     'condition' => $item['condition'],
-                    'reason' => $item['reason']
+                    'reason' => $item['reason'],
+                    'item_name' => $detail->item->item_name ?? null,
+                    'item_code' => $detail->item->item_code ?? null,
                 ]);
             }
 
             DB::commit();
 
-            session()->flash('success', 'Sales return created successfully.');
-            return redirect()->route('sales-returns');
+            $this->dispatch('success', message:'Sales return created successfully.');
+            return redirect()->route('sale-returns');
         } catch (\Throwable $e) {
             DB::rollBack();
-            session()->flash('error', 'Failed to create sales return: ' . $e->getMessage());
+             $this->dispatch('error', message: 'terjadi error ' . $e->getMessage());
             return redirect()->route('sale-returns');
         }
     }
@@ -136,7 +139,7 @@ class CreateSaleReturns extends Component
             ->latest()
             ->paginate(10);
 
-        return view('livewire.superadmin.return.create-sale-returns',[
+        return view('livewire.superadmin.return.create-sale-returns', [
             'sales' => $sales,
         ]);
     }

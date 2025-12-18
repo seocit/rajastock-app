@@ -28,10 +28,7 @@
                 {{ $slot }}
             </div>
 
-            <!-- Footer kata-kata kecil -->
-            <p class="text-gray-300 text-sm mt-4 md:mt-6 opacity-0 animate-fadeIn delay-600">
-                Kelola stok Anda dengan mudah dan cepat
-            </p>
+       
         </div>
     </div>
 

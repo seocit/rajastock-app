@@ -4,7 +4,7 @@
     <flux:separator class="mb-4"></flux:separator>
 
     {{-- Create Role --}}
-    {{-- <div class="border border-gray-300/50 rounded-lg p-4 mb-6">
+    <div class="border border-gray-300/50 rounded-lg p-4 mb-6">
         <flux:heading size="lg" level="2" class="mb-4">Create Role</flux:heading>
 
         <div class="flex items-end gap-4">
@@ -17,10 +17,10 @@
                 Add
             </flux:button>
         </div>
-    </div> --}}
+    </div>
 
     {{-- Create Permission --}}
-    {{-- <div class="border border-gray-300/50 rounded-lg p-4 mb-6">
+    <div class="border border-gray-300/50 rounded-lg p-4 mb-6">
         <flux:heading size="lg" level="2" class="mb-4">Create Permission</flux:heading>
 
         <div class="flex items-end gap-4">
@@ -33,7 +33,7 @@
                 Add
             </flux:button>
         </div>
-    </div> --}}
+    </div>
 
     
     {{-- Group table --}}

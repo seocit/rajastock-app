@@ -12,10 +12,12 @@ class Purchase extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'purchase_code',
         'supplier_id',
         'purchase_date',
         'total_amount',
+        'is_posted',
     ];
 
     public function supplier()
@@ -50,4 +52,8 @@ class Purchase extends Model
         });
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

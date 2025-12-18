@@ -7,6 +7,7 @@ use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Models\Customer;
 use App\Models\Item;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
@@ -105,11 +106,13 @@ class CreateSale extends Component
 
         DB::transaction(function () {
             $sale = Sale::create([
+                'user_id' => Auth::id(), 
                 'sale_code' => 'SAL-' . now()->format('YmdHis'),
                 'customer_id' => $this->customer_id,
                 'sale_date' => $this->sale_date,
                 'description' => $this->description,
                 'total_amount' => $this->total,
+                'is_posted' => false, 
             ]);
 
             foreach ($this->rows as $row) {
@@ -126,9 +129,7 @@ class CreateSale extends Component
                     'subtotal' => $row['subtotal'],
                 ]);
 
-                // Kurangi stok item karena dijual
-                Item::where('id', $row['item_id'])
-                    ->decrement('stock', (int) $row['quantity']);
+                
             }
         });
 

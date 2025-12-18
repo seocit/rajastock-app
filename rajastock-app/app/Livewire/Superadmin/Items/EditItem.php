@@ -16,8 +16,8 @@ class EditItem extends Component
     public $code;
     #[Validate('required|string|max:100')]
     public $name;
-    #[Validate('required|decimal:0,2')]
-    public $price;
+    // #[Validate('required|decimal:0,2')]
+    // public $price;
     #[Validate('required|decimal:0,2')]
     public $sellingPrice;
     #[Validate('required|integer|min:0')]
@@ -38,7 +38,7 @@ class EditItem extends Component
         $this->itemId = $item->id;
         $this->code = $item->item_code;
         $this->name = $item->item_name;
-        $this->price = $item->price;
+        // $this->price = $item->price;
         $this->sellingPrice = $item->selling_price;
         $this->stock = $item->stock;
         $this->minimumStock = $item->minimum_stock;
@@ -54,7 +54,7 @@ class EditItem extends Component
             $item = Item::find($this->itemId);           
             $item->item_code = $this->code;
             $item->item_name = $this->name;
-            $item->price = $this->price;
+            // $item->price = $this->price;
             $item->selling_price = $this->sellingPrice;
             $item->stock  = $this->stock;
             $item->minimum_stock = $this->minimumStock;

@@ -57,6 +57,15 @@ Route::middleware(['auth'])->group(function () {
     // Audit Logs
     Volt::route('audit-logs', 'superadmin.audit.audit-logs')->name('audit-logs');
 
+
+    // Exort Reports
+    Volt::route('reports/items', 'superadmin.reports.item-reports')->name('stock-item-reports');
+    Volt::route('reports/Purchases', 'superadmin.reports.purchase-report')->name('purchase-reports');
+    Volt::route('reports/Sales', 'superadmin.reports.sale-report')->name('sale-reports');
+    Volt::route('reports/PurchaseReturns', 'superadmin.reports.purchase-return-report')->name('purchase-return-reports');
+    Volt::route('reports/SalesReturns', 'superadmin.reports.sales-return-report')->name('sales-return-reports');
+
+
     // Settings
     Route::redirect('settings', 'settings/profile');
 

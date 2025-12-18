@@ -76,14 +76,42 @@ class CreatePurchaseReturn extends Component
   public function save()
   {
     if (! $this->selectedPurchase) {
-      session()->flash('error', 'No purchase selected.');
+      $this->dispatch('error', message:'No purchase selected.');
       return redirect()->route('purchase-returns');
     }
 
     if (empty($this->selectedItems)) {
-      session()->flash('error', 'No items selected for return.');
-      return redirect()->route('purchase-returns');
+      $this->dispatch('error',message: 'No items selected for return.');
+      return;
     }
+    // Validasi setiap item
+    foreach ($this->selectedItems as $detailId => $item) {
+      $detail = $this->selectedPurchase->details->firstWhere('id', $detailId);
+
+      if (! $detail) {
+        $this->dispatch('error',message: 'Detail pembelian tidak valid.');
+        return;
+      }
+
+      if ($item['quantity_returned'] > $detail->quantity) {
+        $this->dispatch(
+          'error',message:
+          'Jumlah retur melebihi jumlah pembelian untuk item: ' .
+            ($detail->item->item_name ?? '-')
+        );
+        return;
+      }
+
+      if ($item['unit_price'] <= 0) {
+        $this->dispatch(
+          'error',message:
+          'Harga satuan tidak valid untuk item: ' .
+            ($detail->item->item_name ?? '-')
+        );
+        return;
+      }
+    }
+    //end validasi
 
     // Hitung total dari sub_total yang sudah berisi unit_price * qty
     $total = collect($this->selectedItems)->sum('sub_total');
@@ -99,27 +127,32 @@ class CreatePurchaseReturn extends Component
       ]);
 
       foreach ($this->selectedItems as $detailId => $item) {
+        $detail = $this->selectedPurchase->details->firstWhere('id', $detailId);
+
         PurchaseReturnDetail::create([
           'purchase_return_id' => $return->id,
           'purchase_detail_id' => $detailId,
           'quantity_returned' => $item['quantity_returned'],
           'sub_total' => $item['sub_total'],
           'condition' => $item['condition'],
-          'reason' => $item['reason']
+          'reason' => $item['reason'],
+          'item_name' => $detail->item->item_name ?? null,
+          'item_code' => $detail->item->item_code ?? null,
         ]);
       }
 
       DB::commit();
 
-      session()->flash('success', 'Purchase return created successfully.');
+      $this->dispatch('success', message:'Purchase return created successfully.');
       return redirect()->route('purchase-returns');
     } catch (\Throwable $e) {
       DB::rollBack();
       // untuk debugging sementara kamu bisa log atau session flash error
-      session()->flash('error', 'Failed to create purchase return: ' . $e->getMessage());
-      return redirect()->route('purchase-returns');
+      $this->dispatch('error',message: 'Failed to create purchase return: ' . $e->getMessage());
+      return;
     }
   }
+
   public function recalculateSubTotal($detailId)
   {
     if (!isset($this->selectedItems[$detailId])) return;

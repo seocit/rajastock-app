@@ -3,7 +3,9 @@
 namespace App\Livewire\Superadmin\Transaction;
 
 use App\Models\Sale;
+use App\Models\Customer;
 use Flux\Flux;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,6 +17,12 @@ class Sales extends Component
     public $search = '';
     public $saleId;
 
+    // FILTERS
+    public $customerId = '';
+    public $dateStart = '';
+    public $dateEnd = '';
+
+
     #[Computed()]
     public function sales()
     {
@@ -25,8 +33,34 @@ class Sales extends Component
                         $q->where('customer_name', 'like', '%' . $this->search . '%');
                     });
             })
+            ->when(
+                $this->customerId,
+                fn($q) =>
+                $q->where('customer_id', $this->customerId)
+            )
+            ->when(
+                $this->dateStart,
+                fn($q) =>
+                $q->whereDate('sale_date', '>=', $this->dateStart)
+            )
+            ->when(
+                $this->dateEnd,
+                fn($q) =>
+                $q->whereDate('sale_date', '<=', $this->dateEnd)
+            )
+
             ->latest()
             ->paginate(10);
+    }
+
+    public function resetFilters()
+    {
+        $this->customerId = '';
+        $this->dateStart = '';
+        $this->dateEnd = '';
+
+
+        $this->dispatch('refreshSalesList');
     }
 
     public function showDetails($saleId)
@@ -34,48 +68,78 @@ class Sales extends Component
         $this->dispatch('showSaleDetails', saleId: $saleId);
     }
 
+    public function postSale($id)
+    {
+        $sale = Sale::with('saleDetails.item')->findOrFail($id);
 
-     public function delete($id)
+        if ($sale->is_posted) {
+            session()->flash('error', 'Sale sudah diposting');
+            return;
+        }
+
+        DB::transaction(function () use ($sale) {
+
+            // cek stok
+            foreach ($sale->saleDetails as $detail) {
+                if ($detail->item->stock < $detail->quantity) {
+                    throw new \Exception(
+                        "Stok {$detail->item->item_name} tidak mencukupi"
+                    );
+                }
+            }
+
+            // kurangi stok
+            foreach ($sale->saleDetails as $detail) {
+                $detail->item->decrement('stock', $detail->quantity);
+            }
+
+            $sale->update([
+                'status' => 'posted',
+                'is_posted' => true,
+            ]);
+        });
+
+        session()->flash('success', 'Sale berhasil diposting & stok dikurangi');
+    }
+
+
+    public function delete($id)
     {
         $this->saleId = $id;
-
         Flux::modal('delete-sale')->show();
     }
 
     public function deleteSale()
     {
-        $sale = Sale::with('saleDetails.item')->find($this->saleId);
+        $sale = Sale::find($this->saleId);
 
-        if ($sale) {
-
-            // Kembalikan stok
-            foreach ($sale->saleDetails as $detail) {
-                if ($detail->item) {
-                    $detail->item->stock += $detail->qty;
-                    $detail->item->save();
-                }
-            }
-
-            // Hapus semua detail
-            $sale->saleDetails()->delete();
-
-            // Hapus Sales utama
-            $sale->delete();
+        if (! $sale) {
+            $this->dispatch('error', message:'Data sale tidak ditemukan');
+            return;
         }
 
-        session()->flash('success', 'Sale berhasil dihapus!');
+        if ($sale->is_posted) {
+            $this->dispatch('error', message:'Sale yang sudah diposting tidak bisa dihapus');
+            Flux::modal('delete-sale')->close();
+            return;
+        }
+
+        $sale->saleDetails()->delete();
+        $sale->delete();
+
+        $this->dispatch('success', message: 'Sale draft berhasil dihapus');
 
         Flux::modal('delete-sale')->close();
-
-        // refresh tabel
         $this->dispatch('refreshSalesList');
 
-        // clear id
         $this->saleId = null;
     }
 
+
     public function render()
     {
-        return view('livewire.superadmin.transaction.sale');
+        return view('livewire.superadmin.transaction.sale', [
+            'customers' => Customer::all()
+        ]);
     }
 }

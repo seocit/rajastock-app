@@ -17,6 +17,10 @@ class PurchaseReturn extends Model
         'status',
     ];
 
+    protected $casts = [
+        'return_date' => 'date',
+    ];
+
     public function purchase()
     {
         return $this->belongsTo(Purchase::class);

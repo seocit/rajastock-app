@@ -35,7 +35,8 @@
                 <table class="min-w-full text-sm border-collapse">
                     <thead class="bg-gray-100 sticky top-0">
                         <tr>
-                            <th class="p-2 text-left">Item</th>
+                            <th class="p-2 text-left">Item Code</th>
+                            <th class="p-2 text-left">Item Name</th>
                             <th class="p-2 text-right">Qty Returned</th>
                             <th class="p-2 text-left">Condition</th>
                             <th class="p-2 text-left">Reason</th>
@@ -45,7 +46,8 @@
                     <tbody>
                         @foreach ($details as $d)
                             <tr class="border-t hover:bg-gray-50">
-                                <td class="p-2">{{ $d->salesDetail->item->item_name ?? '-' }}</td>
+                                <td class="p-2">{{ $d->item_code ?? '-' }}</td>
+                                <td class="p-2">{{ $d->item_name ?? '-' }}</td>
                                 <td class="p-2 text-right">{{ $d->quantity_returned }}</td>
                                 <td class="p-2 text-left">{{ ucfirst($d->condition) }}</td>
                                 <td class="p-2 text-left">{{ $d->reason ?: '-' }}</td>

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('merks', function (Blueprint $table) {
             $table->id();
             $table->string('merk_name');
-            $table->text('code')->unique();
+            $table->string('code', 50)->unique();
             $table->timestamps();
         });
     }

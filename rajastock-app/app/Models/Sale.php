@@ -12,11 +12,13 @@ class Sale extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'sale_code',
         'customer_id',
         'sale_date',
         'description',
         'total_amount',
+        'is_posted',
     ];
 
     public function customer()
@@ -32,5 +34,10 @@ class Sale extends Model
     public function salesReturns()
     {
         return $this->hasMany(SalesReturn::class);
+    }
+
+      public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

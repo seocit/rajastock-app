@@ -1,26 +1,60 @@
 <div>
     <flux:heading size="xl" level="1">Transaction | Purchases</flux:heading>
-    <flux:text size="" class="mt-2">purchases list</flux:text>
+    <flux:text class="mt-2">purchases list</flux:text>
     <flux:separator class="mb-4"></flux:separator>
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        <!-- Searchbar -->
 
-        <div class="flex w-full">
-            <div wire:model.live.debounce.500ms="search" class="w-full md:w-1/3 mx-2">
-                <flux:input icon="magnifying-glass" placeholder="Search items..." class="w-full" />
-            </div>
-            <flux:button icon="funnel">sort</flux:button>
+    {{-- TOP BAR --}}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+
+        {{-- SEARCH --}}
+        <div class="w-full md:w-1/3">
+            <flux:input wire:model.live.debounce.500ms="search" icon="magnifying-glass"
+                placeholder="Search purchases..." />
         </div>
-        <!-- Add Item Button -->
-        <div>
+
+        {{-- CREATE BUTTON --}}
+        <div class="flex justify-start md:justify-end">
             <flux:button as="a" href="{{ route('create-purchases') }}" variant="primary" color="blue">
                 Create Purchase
             </flux:button>
         </div>
 
+    </div>
+
+    {{-- FILTER GRID --}}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+
+        {{-- Supplier Filter --}}
+        <div>
+            <flux:select wire:model.live="supplierId">
+                <option value="">All Suppliers</option>
+                @foreach (\App\Models\Supplier::all() as $sup)
+                    <option value="{{ $sup->id }}">{{ $sup->supplier_name }}</option>
+                @endforeach
+            </flux:select>
+        </div>
+
+        {{-- Date Start --}}
+        <div>
+            <flux:input type="date" wire:model.live="dateStart" placeholder="Start Date" />
+        </div>
+
+        {{-- Date End --}}
+        <div>
+            <flux:input type="date" wire:model.live="dateEnd" placeholder="End Date" />
+        </div>
+
+        {{-- Reset Button --}}
+        <div class="flex items-center justify-start md:justify-end">
+            <flux:button icon="arrow-path" variant="primary" wire:click="resetFilters">
+                Reset
+            </flux:button>
+        </div>
 
     </div>
-    {{-- Table --}}
+
+
+    {{-- TABLE --}}
     <div class="overflow-x-auto border rounded-lg">
         <table class="min-w-full text-sm text-left">
             <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -30,84 +64,94 @@
                     <th class="px-4 py-2">Supplier</th>
                     <th class="px-4 py-2">Date</th>
                     <th class="px-4 py-2">Total</th>
-                    {{-- <th class="px-4 py-2">Status</th> --}}
+                    <th class="px-4 py-2">Status</th>
                     <th class="px-4 py-2 text-center">Action</th>
                 </tr>
             </thead>
+
             <tbody>
-                @forelse ($this->purchase as $index => $purchase)
+                @forelse ($this->purchase as $purchase)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="px-4 py-2">{{ $loop->iteration }}</td>
                         <td class="px-4 py-2">{{ $purchase->purchase_code }}</td>
                         <td class="px-4 py-2">{{ $purchase->supplier->supplier_name ?? '-' }}</td>
                         <td class="px-4 py-2">{{ $purchase->purchase_date }}</td>
                         <td class="px-4 py-2">Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}</td>
-                        {{-- <td class="px-4 py-2">
-                            <span
-                                class="px-2 py-1 rounded-full text-xs
-                            {{ $purchase->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ ucfirst($purchase->status) }}
-                            </span>
-                        </td> --}}
+                        <td class="px-4 py-2">
+                            @if ($purchase->is_posted)
+                                <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-700 font-semibold">
+                                    POSTED
+                                </span>
+                            @else
+                                <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-700 font-semibold">
+                                    DRAFT
+                                </span>
+                            @endif
+                        </td>
+
                         <td class="px-4 py-2 text-center space-x-2">
+
+                            {{-- VIEW (selalu boleh) --}}
                             <flux:button size="sm" color="secondary" wire:click="showDetails({{ $purchase->id }})">
                                 View
                             </flux:button>
-                            @role('Admin')
+
+                            @if (!$purchase->is_posted)
+                                {{-- POST --}}
+                                <flux:button size="sm" variant="primary" color="green"
+                                    wire:click="post({{ $purchase->id }})">
+                                    Post
+                                </flux:button>
+
+                                {{-- EDIT --}}
                                 <flux:button size="sm" variant="primary" color="blue"
                                     href="{{ route('edit-purchases', $purchase->id) }}">
                                     Edit
                                 </flux:button>
+
+                                {{-- DELETE --}}
                                 <flux:button size="sm" variant="danger" wire:click="delete({{ $purchase->id }})">
                                     Delete
                                 </flux:button>
-                            @endrole
+                            @endif
                         </td>
+
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-gray-500">No purchases found.</td>
+                        <td colspan="6" class="text-center py-4 text-gray-500">No purchases found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    {{-- Pagination --}}
-    <div>
+    {{-- PAGINATION --}}
+    <div class="mt-4">
         {{ $this->purchase->links() }}
     </div>
 
-    {{-- Modal Component --}}
     <livewire:superadmin.transaction.detail-purchase />
 
-    {{-- Deleting confirmation modal --}}
+    {{-- Delete Modal --}}
     <flux:modal name="delete-purchase" class="min-w-88">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Delete Purchase?</flux:heading>
-
                 <flux:text class="mt-2">
-                    <p>You're about to delete this purchase record.</p>
-                    <p>All purchase details will also be deleted.</p>
-                    <p>This action cannot be reversed.</p>
+                    <p>Apakah anda yakin akan menghapus record Pembelian ini?</p>
                 </flux:text>
             </div>
 
-            <div class="flex gap-2">
-                <flux:spacer />
-
+            <div class="flex justify-end gap-2">
                 <flux:modal.close>
-                    <flux:button variant="ghost">Cancel</flux:button>
+                    <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
 
-                <flux:button type="submit" variant="danger" wire:click="deletePurchase()">
-                    Delete
+                <flux:button variant="danger" wire:click="deletePurchase">
+                    Ya, Hapus!
                 </flux:button>
             </div>
         </div>
     </flux:modal>
-
-
-
 </div>

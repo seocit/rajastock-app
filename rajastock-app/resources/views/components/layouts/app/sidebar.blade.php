@@ -6,75 +6,25 @@
     @fluxAppearance
 </head>
 
+
 <body class="min-h-screen bg-white dark:bg-zinc-800 antialiased">
     <flux:sidebar sticky collapsible class="bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
 
 
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-        {{-- <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
-                <x-app-logo />
-            </a> --}}
         <flux:sidebar.header>
-            <flux:sidebar.brand :href="route('dashboard')" logo="https://fluxui.dev/img/demo/logo.png"
-                logo:dark="https://fluxui.dev/img/demo/dark-mode-logo.png" name="Raja Stock" />
+            <flux:sidebar.brand :href="route('dashboard')" logo="/images/RajaStock.png"
+                 name="Raja Stock" />
             <flux:sidebar.collapse
                 class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2" />
         </flux:sidebar.header>
 
-        {{-- <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('Home')" expandable class="grid">
-                <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
-                    wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-            </flux:navlist.group>
-            <flux:navlist.group icon="folder-open" :heading="__('Produk')" expandable class="grid">
-                <flux:navlist.item icon="folder" :href="route('items')" :current="request()->routeIs('items')"
-                    wire:navigate>{{ __('List Barang') }}</flux:navlist.item>
-                <flux:navlist.item icon="folder" :href="route('merk')" :current="request()->routeIs('merk')"
-                    wire:navigate>{{ __('List Merek') }}</flux:navlist.item>
-            </flux:navlist.group>
-            <flux:navlist.group :heading="__('Contacts')" expandable class="grid">
-                <flux:navlist.item icon="building-office" :href="route('supplier')"
-                    :current="request()->routeIs('supplier')" wire:navigate>{{ __('Supplier') }}</flux:navlist.item>
-                <flux:navlist.item icon="users" :href="route('customer')" :current="request()->routeIs('customer')"
-                    wire:navigate>{{ __('Customer') }}</flux:navlist.item>
-            </flux:navlist.group>
-            <flux:navlist.group :heading="__('Transaksi')" expandable class="grid">
-                <flux:navlist.item icon="shopping-cart" :href="route('purchases')"
-                    :current="request()->routeIs('purchases')" wire:navigate>{{ __('Stok Masuk') }}</flux:navlist.item>
-                <flux:navlist.item icon="shopping-bag" :href="route('sales')" :current="request()->routeIs('sales')"
-                    wire:navigate>{{ __('Stok Keluar') }}</flux:navlist.item>
-            </flux:navlist.group>
-            @role('Admin')
-                <flux:navlist.group :heading="__('Retur Barang')" expandable class="grid">
-                    <flux:navlist.item icon="shopping-cart" :href="route('purchase-returns')"
-                        :current="request()->routeIs('purchase-returns')" wire:navigate>{{ __('Stok Masuk') }}
-                    </flux:navlist.item>
-                    <flux:navlist.item icon="shopping-bag" :href="route('sale-returns')"
-                        :current="request()->routeIs('sale-returns')" wire:navigate>{{ __('Stok Keluar') }}
-                    </flux:navlist.item>
-                </flux:navlist.group>
-            @endrole
-            @role('Admin')
-                <flux:navlist.group :heading="__('Manajemen User')" expandable class="grid">
-                    <flux:navlist.item icon="users" :href="route('users')" :current="request()->routeIs('users')"
-                        wire:navigate>{{ __('Users') }}</flux:navlist.item>
-                    <flux:navlist.item icon="key" :href="route('roles')" :current="request()->routeIs('roles')"
-                        wire:navigate>{{ __('Roles') }}</flux:navlist.item>
-                    <flux:navlist.item icon="document-check" :href="route('audit-logs')"
-                        :current="request()->routeIs('audit-logs')" wire:navigate>{{ __('Audit Log') }}
-                    </flux:navlist.item>
-                </flux:navlist.group>
-            @endrole
-            @role('Admin')
-                <flux:navlist.group :heading="__('Export Laporan')" class="grid">
 
-                </flux:navlist.group>
-            @endrole
-
-        </flux:navlist> --}}
         <flux:sidebar.nav>
+
             <!-- Home -->
+           
             <flux:sidebar.group expandable icon="home" heading="Home" class="grid">
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>
@@ -110,53 +60,81 @@
 
             <!-- Transaksi -->
             <flux:sidebar.group expandable icon="shopping-cart" heading="Transaksi" class="grid">
+                @can('view purchases')
                 <flux:navlist.item icon="shopping-cart" :href="route('purchases')"
                     :current="request()->routeIs('purchases')" wire:navigate>
                     Stok Masuk
                 </flux:navlist.item>
-
+                    
+                @endcan
+                @can('view sales')                   
                 <flux:navlist.item icon="shopping-bag" :href="route('sales')" :current="request()->routeIs('sales')"
                     wire:navigate>
                     Stok Keluar
                 </flux:navlist.item>
+                @endcan
             </flux:sidebar.group>
 
-            @role('Admin')
-                <!-- Retur Barang -->
-                <flux:sidebar.group expandable icon="arrow-path" heading="Retur Barang" class="grid">
-                    <flux:navlist.item icon="shopping-cart" :href="route('purchase-returns')"
-                        :current="request()->routeIs('purchase-returns')" wire:navigate>
-                        Stok Masuk
-                    </flux:navlist.item>
 
-                    <flux:navlist.item icon="shopping-bag" :href="route('sale-returns')"
-                        :current="request()->routeIs('sale-returns')" wire:navigate>
-                        Stok Keluar
-                    </flux:navlist.item>
-                </flux:sidebar.group>
+            <!-- Retur Barang -->
+            @can('view purchase returns')
+            <flux:sidebar.group expandable icon="arrow-path" heading="Retur Barang" class="grid">
+                <flux:navlist.item icon="shopping-cart" :href="route('purchase-returns')"
+                    :current="request()->routeIs('purchase-returns')" wire:navigate>
+                    Stok Masuk
+                </flux:navlist.item>
 
-                <!-- Manajemen User -->
-                <flux:sidebar.group expandable icon="key" heading="Manajemen User" class="grid">
-                    <flux:navlist.item icon="users" :href="route('users')" :current="request()->routeIs('users')"
-                        wire:navigate>
-                        Users
-                    </flux:navlist.item>
+                <flux:navlist.item icon="shopping-bag" :href="route('sale-returns')"
+                    :current="request()->routeIs('sale-returns')" wire:navigate>
+                    Stok Keluar
+                </flux:navlist.item>
+            </flux:sidebar.group>
+                
+            @endcan
+            @role('superadmin|admin')
+            <flux:sidebar.group expandable icon="key" heading="Manajemen User" class="grid">
+                @role('superadmin')
+                <flux:navlist.item icon="users" :href="route('users')" :current="request()->routeIs('users')"
+                    wire:navigate>
+                    Users
+                </flux:navlist.item>
+                @endrole
+                @role('superadmin|admin')
+                <flux:navlist.item icon="document-check" :href="route('audit-logs')"
+                    :current="request()->routeIs('audit-logs')" wire:navigate>
+                    Audit Log
+                </flux:navlist.item>
+                @endrole
+            </flux:sidebar.group>      
+             @endrole         
+            <!-- Manajemen User -->
 
-                    <flux:navlist.item icon="key" :href="route('roles')" :current="request()->routeIs('roles')"
-                        wire:navigate>
-                        Roles
-                    </flux:navlist.item>
+            <!-- Export -->
+            @can('view reports')                
+            <flux:sidebar.group expandable icon="document-arrow-down" heading="Export Laporan" class="grid">
+                <flux:navlist.item icon="document-check" :href="route('stock-item-reports')"
+                    :current="request()->routeIs('stock-item-reports')" wire:navigate>
+                    Stok Barang
+                </flux:navlist.item>
+                <flux:navlist.item icon="document-check" :href="route('purchase-reports')"
+                    :current="request()->routeIs('purchase-reports')" wire:navigate>
+                    Laporan Stok Masuk
+                </flux:navlist.item>
+                <flux:navlist.item icon="document-check" :href="route('sale-reports')"
+                    :current="request()->routeIs('sale-reports')" wire:navigate>
+                    Laporan Stok Keluar
+                </flux:navlist.item>
+                <flux:navlist.item icon="document-check" :href="route('purchase-return-reports')"
+                    :current="request()->routeIs('purchase-return-reports')" wire:navigate>
+                    Laporan Retur Stok Masuk
+                </flux:navlist.item>
+                <flux:navlist.item icon="document-check" :href="route('sales-return-reports')"
+                    :current="request()->routeIs('sales-return-reports')" wire:navigate>
+                    Laporan Retur Stok Keluar
+                </flux:navlist.item>
+            </flux:sidebar.group>
+            @endcan
 
-                    <flux:navlist.item icon="document-check" :href="route('audit-logs')"
-                        :current="request()->routeIs('audit-logs')" wire:navigate>
-                        Audit Log
-                    </flux:navlist.item>
-                </flux:sidebar.group>
-
-                <!-- Export -->
-                <flux:sidebar.group expandable icon="document-arrow-down" heading="Export Laporan" class="grid">
-                </flux:sidebar.group>
-            @endrole
 
         </flux:sidebar.nav>
 

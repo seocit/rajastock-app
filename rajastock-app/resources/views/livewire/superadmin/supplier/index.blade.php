@@ -11,15 +11,14 @@
                 <flux:input  icon="magnifying-glass" placeholder="Search items..."
                     class="w-full" />
             </div>
-            <flux:button icon="funnel">sort</flux:button>
         </div>
         <!-- Add Item Button -->
         <div>
-            @role('Admin')
+            @can('create suppliers')
             <flux:modal.trigger name="create-supplier">
                 <flux:button variant="primary" color="blue">Add Supplier</flux:button>
             </flux:modal.trigger>
-            @endrole
+            @endcan
             <livewire:superadmin.supplier.create-supplier />
             <livewire:superadmin.supplier.edit-supplier />
         </div>
@@ -50,14 +49,14 @@
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->email }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->no_contact }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $item->address }}</td>
-                        @role('Admin')
+                        @can('edit suppliers')
                         <td class="px-4 py-2 text-sm">
                             <flux:button wire:click="edit({{ $item->id }})" :loading="true" variant="primary"
                                 size="sm" color="blue">Edit</flux:button>
                             <flux:button wire:click="delete({{ $item->id }})" :loading="false"
                                 variant="danger" size="sm">Delete</flux:button>
                         </td>
-                        @endrole
+                        @endcan
                     </tr>
                 @empty
                     <tr>
@@ -79,8 +78,7 @@
                 <flux:heading size="lg">Delete Supplier?</flux:heading>
 
                 <flux:text class="mt-2">
-                    <p>You're about to delete this item.</p>
-                    <p>This action cannot be reversed.</p>
+                    <p>Apakah anda yakin akan menghapus supplier ini?</p>                   
                 </flux:text>
             </div>
 
@@ -88,10 +86,10 @@
                 <flux:spacer />
 
                 <flux:modal.close>
-                    <flux:button variant="ghost">Cancel</flux:button>
+                    <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
 
-                <flux:button type="submit" variant="danger" wire:click="deleteSupplier()">Delete</flux:button>
+                <flux:button type="submit" variant="danger" wire:click="deleteSupplier()">Ya, Hapus!</flux:button>
             </div>
         </div>
     </flux:modal>

@@ -15,11 +15,8 @@ class Index extends Component
 
     public $search = '';
     public $itemId;
-
-    public function placeholder(){
-        return view('animation.loading-overlay');
-    }
-
+    public $filter = '';
+  
 
     public function updatingSearch()
     {
@@ -40,13 +37,22 @@ class Index extends Component
                         $q->where(function ($sub) use ($word) {
                             $sub->where('item_name', 'like', "%{$word}%")
                                 ->orWhere('item_code', 'like', "%{$word}%")
-                                ->orWhereHas('merk', function ($q2) use ($word) {
-                                    $q2->where('merk_name', 'like', "%{$word}%");
-                                });
+                                ->orWhereHas(
+                                    'merk',
+                                    fn($q2) =>
+                                    $q2->where('merk_name', 'like', "%{$word}%")
+                                );
                         });
                     }
                 });
             })
+
+          
+            ->when($this->filter === 'cheapest', fn($q) => $q->orderBy('selling_price', 'asc'))
+            ->when($this->filter === 'expensive', fn($q) => $q->orderBy('selling_price', 'desc'))
+            ->when($this->filter === 'most_stock', fn($q) => $q->orderBy('stock', 'desc'))
+            ->when($this->filter === 'least_stock', fn($q) => $q->orderBy('stock', 'asc'))
+
             ->latest()
             ->paginate(10);
     }
