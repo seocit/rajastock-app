@@ -68,39 +68,60 @@ class Sales extends Component
         $this->dispatch('showSaleDetails', saleId: $saleId);
     }
 
-    public function postSale($id)
+    public function confirmPostSale($id)
     {
-        $sale = Sale::with('saleDetails.item')->findOrFail($id);
+        $this->saleId = $id;
+        Flux::modal('post-sale')->show();
+    }
 
-        if ($sale->is_posted) {
-            session()->flash('error', 'Sale sudah diposting');
+    public function postSaleConfirmed()
+    {
+        $sale = Sale::with('saleDetails.item')->find($this->saleId);
+
+        if (! $sale) {
+            $this->dispatch('error', message: 'Data sale tidak ditemukan');
+            Flux::modal('post-sale')->close();
             return;
         }
 
-        DB::transaction(function () use ($sale) {
+        if ($sale->is_posted) {
+            $this->dispatch('error', message: 'Sale sudah diposting');
+            Flux::modal('post-sale')->close();
+            return;
+        }
 
-            // cek stok
-            foreach ($sale->saleDetails as $detail) {
-                if ($detail->item->stock < $detail->quantity) {
-                    throw new \Exception(
-                        "Stok {$detail->item->item_name} tidak mencukupi"
-                    );
+        try {
+            DB::transaction(function () use ($sale) {
+
+                // cek stok
+                foreach ($sale->saleDetails as $detail) {
+                    if ($detail->item->stock < $detail->quantity) {
+                        throw new \Exception(
+                            "Stok {$detail->item->item_name} tidak mencukupi"
+                        );
+                    }
                 }
-            }
 
-            // kurangi stok
-            foreach ($sale->saleDetails as $detail) {
-                $detail->item->decrement('stock', $detail->quantity);
-            }
+                // kurangi stok
+                foreach ($sale->saleDetails as $detail) {
+                    $detail->item->decrement('stock', $detail->quantity);
+                }
 
-            $sale->update([
-                'status' => 'posted',
-                'is_posted' => true,
-            ]);
-        });
+                $sale->update([
+                    'status' => 'posted',
+                    'is_posted' => true,
+                ]);
+            });
 
-        session()->flash('success', 'Sale berhasil diposting & stok dikurangi');
+            $this->dispatch('success', message: 'Sale berhasil diposting & stok dikurangi');
+        } catch (\Exception $e) {
+            $this->dispatch('error', message: $e->getMessage());
+        }
+
+        Flux::modal('post-sale')->close();
+        $this->saleId = null;
     }
+
 
 
     public function delete($id)
@@ -114,12 +135,12 @@ class Sales extends Component
         $sale = Sale::find($this->saleId);
 
         if (! $sale) {
-            $this->dispatch('error', message:'Data sale tidak ditemukan');
+            $this->dispatch('error', message: 'Data sale tidak ditemukan');
             return;
         }
 
         if ($sale->is_posted) {
-            $this->dispatch('error', message:'Sale yang sudah diposting tidak bisa dihapus');
+            $this->dispatch('error', message: 'Sale yang sudah diposting tidak bisa dihapus');
             Flux::modal('delete-sale')->close();
             return;
         }

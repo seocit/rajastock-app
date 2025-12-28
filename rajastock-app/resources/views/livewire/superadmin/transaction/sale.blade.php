@@ -97,30 +97,21 @@
                             <flux:button size="sm" color="secondary" wire:click="showDetails({{ $sale->id }})">
                                 View
                             </flux:button>
-
                             @if (!$sale->is_posted)
-                                
-                                    {{-- POST --}}
-                                    <flux:button size="sm" variant="primary" color="green"
-                                        wire:click="postSale({{ $sale->id }})">
-                                        Post
-                                    </flux:button>
-                               
-
-                                
-                                    {{-- EDIT --}}
-                                    <flux:button size="sm" variant="primary" color="blue"
-                                        href="{{ route('edit-sale', $sale->id) }}">
-                                        Edit
-                                    </flux:button>
-                                
-
-                                
-                                    {{-- DELETE --}}
-                                    <flux:button size="sm" variant="danger" wire:click="delete({{ $sale->id }})">
-                                        Delete
-                                    </flux:button>
-                                
+                                {{-- POST --}}
+                                <flux:button size="sm" variant="primary" color="green"
+                                    wire:click="confirmPostSale({{ $sale->id }})">
+                                    Post
+                                </flux:button>
+                                {{-- EDIT --}}
+                                <flux:button size="sm" variant="primary" color="blue"
+                                    href="{{ route('edit-sale', $sale->id) }}">
+                                    Edit
+                                </flux:button>
+                                {{-- DELETE --}}
+                                <flux:button size="sm" variant="danger" wire:click="delete({{ $sale->id }})">
+                                    Delete
+                                </flux:button>
                             @endif
                         </td>
 
@@ -162,6 +153,38 @@
 
                 <flux:button variant="danger" wire:click="deleteSale">
                     Ya, Hapus!
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
+
+    {{-- Post Sale Confirmation Modal --}}
+    <flux:modal name="post-sale" class="min-w-88">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Post Sale?</flux:heading>
+                <flux:text class="mt-2">
+                    <p>Setelah penjualan diposting:</p>
+
+                    <ul class="list-disc list-inside mt-2 text-sm text-gray-600">
+                        <li>Stok barang akan dikurangi</li>
+                        <li>Data penjualan tidak bisa diedit atau dihapus</li>
+                    </ul>
+
+                    <p class="mt-3 font-medium text-red-600">
+                        Yakin ingin melanjutkan?
+                    </p>
+                </flux:text>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Batal</flux:button>
+                </flux:modal.close>
+
+                <flux:button variant="primary" color="green" wire:click="postSaleConfirmed">
+                    Ya, Post Sekarang
                 </flux:button>
             </div>
         </div>

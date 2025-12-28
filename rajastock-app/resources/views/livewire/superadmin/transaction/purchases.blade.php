@@ -99,7 +99,7 @@
                             @if (!$purchase->is_posted)
                                 {{-- POST --}}
                                 <flux:button size="sm" variant="primary" color="green"
-                                    wire:click="post({{ $purchase->id }})">
+                                    wire:click="confirmPost({{ $purchase->id }})">
                                     Post
                                 </flux:button>
 
@@ -154,4 +154,37 @@
             </div>
         </div>
     </flux:modal>
+
+
+    {{-- Post Confirmation Modal --}}
+    <flux:modal name="post-purchase" class="min-w-88">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Post Purchase?</flux:heading>
+                <flux:text class="mt-2">
+                    <p>
+                        Setelah diposting:
+                    </p>
+                    <ul class="list-disc list-inside mt-2 text-sm text-gray-600">
+                        <li>Stok barang akan bertambah</li>
+                        <li>Data pembelian tidak bisa diedit atau dihapus</li>
+                    </ul>
+                    <p class="mt-3 font-medium text-red-600">
+                        Yakin ingin melanjutkan?
+                    </p>
+                </flux:text>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Batal</flux:button>
+                </flux:modal.close>
+
+                <flux:button variant="primary" color="green" wire:click="postConfirmed">
+                    Ya, Post Sekarang
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
 </div>

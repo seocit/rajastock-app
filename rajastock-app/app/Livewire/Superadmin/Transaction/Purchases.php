@@ -25,7 +25,7 @@ class Purchases extends Component
     #[Computed()]
     public function purchase()
     {
-        return Purchase::with('supplier','user')
+        return Purchase::with('supplier', 'user')
             ->when($this->search, function ($query) {
                 $query->where('purchase_code', 'like', '%' . $this->search . '%')
                     ->orWhereHas(
@@ -67,17 +67,29 @@ class Purchases extends Component
         $this->dispatch('showPurchaseDetails', purchaseId: $purchaseId);
     }
 
-    public function post($id)
+    public function confirmPost($id)
     {
-        $purchase = Purchase::with('details')->findOrFail($id);
+        $this->purchaseId = $id;
+        Flux::modal('post-purchase')->show();
+    }
+
+    public function postConfirmed()
+    {
+        $purchase = Purchase::with('details')->find($this->purchaseId);
+
+        if (! $purchase) {
+            $this->dispatch('error', message: 'Data purchase tidak ditemukan');
+            Flux::modal('post-purchase')->close();
+            return;
+        }
 
         if ($purchase->is_posted) {
-            session()->flash('error', 'Purchase sudah diposting');
+            $this->dispatch('error', message: 'Purchase sudah diposting');
+            Flux::modal('post-purchase')->close();
             return;
         }
 
         DB::transaction(function () use ($purchase) {
-
             foreach ($purchase->details as $detail) {
                 $detail->item->increment('stock', $detail->quantity);
             }
@@ -88,7 +100,9 @@ class Purchases extends Component
         });
 
         $this->dispatch('success', message: 'Purchase posted successfully!');
+        Flux::modal('post-purchase')->close();
     }
+
 
 
     public function delete($id)

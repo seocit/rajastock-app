@@ -6,33 +6,30 @@ use App\Models\Merk;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Merk>
- */
 class MerkFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-
-protected static $counter = 1;
+    protected $model = Merk::class;
 
     public function definition(): array
-        {
-            $name = $this->faker->company();
-            $words = explode(' ', strtoupper($name));
+    {
+        $merks = [
+            'GS Astra',
+            'Yuasa',
+            'Amaron',
+            'Delkor',
+            'Incoe',
+            'Bosch',
+            'Motobatt',
+            'Deltec',
+        ];
 
-            $baseCode = strtoupper(Str::substr(Str::replace(' ', '', $name), 0, 3));
-            $firstWord = $words[0]; 
-            $uniquePart = strtoupper(substr(uniqid(), -4));
+        $name = $this->faker->unique()->randomElement($merks);
+        $prefix = strtoupper(Str::of($name)->replace(' ', '')->substr(0, 3));
+        $code = $prefix . '-' . strtoupper(Str::random(4));
 
-            $code = $baseCode . '-' . $firstWord . '-' . $uniquePart;
-
-            return [
-                'merk_name' => $name, 
-                'code'      => $code, 
-            ];
-        }
+        return [
+            'merk_name' => $name,
+            'code' => $code,
+        ];
+    }
 }

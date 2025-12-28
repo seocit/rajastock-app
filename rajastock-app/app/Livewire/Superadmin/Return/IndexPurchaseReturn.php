@@ -4,6 +4,7 @@ namespace App\Livewire\Superadmin\Return;
 
 use App\Models\PurchaseReturn;
 use Flux\Flux;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -84,17 +85,17 @@ class IndexPurchaseReturn extends Component
         if ($return) {
 
 
-            foreach ($return->details as $detail) {
-                $purchaseDetail = $detail->purchaseDetail;
+            if ($return->status === 'completed') {
+                foreach ($return->details as $detail) {
+                    $purchaseDetail = $detail->purchaseDetail;
 
-                if ($purchaseDetail && $purchaseDetail->item) {
-                    $item = $purchaseDetail->item;
-
-                    // tambah stok sesuai qty return
-                    $item->stock += $detail->quantity_returned;
-                    $item->save();
+                    if ($purchaseDetail && $purchaseDetail->item) {
+                        $item = $purchaseDetail->item;
+                        $item->increment('stock', $detail->quantity_returned);
+                    }
                 }
             }
+
 
 
             $return->details()->delete();
@@ -119,15 +120,60 @@ class IndexPurchaseReturn extends Component
             return;
         }
 
-        $return = PurchaseReturn::with('details.purchaseDetail.item')->findOrFail($id);
+        DB::beginTransaction();
+        try {
+            $return = PurchaseReturn::with('details.purchaseDetail.item')->lockForUpdate()->findOrFail($id);
+            $oldStatus = $return->status;
 
-        // update status
-        $return->status = $newStatus;
-        $return->save();
+            // Kalau status tidak berubah, skip
+            if ($oldStatus === $newStatus) {
+                DB::rollBack();
+                $this->dispatch('toast', type: 'info', message: 'Status tidak berubah.');
+                return;
+            }
 
-        $this->dispatch('toast', type: 'success', message: 'Status berhasil diperbarui.');
-        $this->dispatch('refreshReturnPurchaseList');
+            // TRANSISI: bukan completed -> completed (kurangi stok)
+            if ($oldStatus !== 'completed' && $newStatus === 'completed') {
+                foreach ($return->details as $detail) {
+                    $item = $detail->purchaseDetail?->item;
+
+                    if ($item) {
+                        // optional: validasi stok cukup
+                        if ($item->stock < $detail->quantity_returned) {
+                            DB::rollBack();
+                            $this->dispatch('toast', type: 'error', message: "Stok tidak cukup untuk item {$item->item_name}.");
+                            return;
+                        }
+
+                        $item->decrement('stock', $detail->quantity_returned);
+                    }
+                }
+            }
+
+            // TRANSISI: completed -> selain completed (balikin stok)
+            if ($oldStatus === 'completed' && $newStatus !== 'completed') {
+                foreach ($return->details as $detail) {
+                    $item = $detail->purchaseDetail?->item;
+                    if ($item) {
+                        $item->increment('stock', $detail->quantity_returned);
+                    }
+                }
+            }
+
+            // update status
+            $return->status = $newStatus;
+            $return->save();
+
+            DB::commit();
+
+            $this->dispatch('toast', type: 'success', message: 'Status berhasil diperbarui.');
+            $this->dispatch('refreshReturnPurchaseList');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $this->dispatch('toast', type: 'error', message: 'Gagal update status: ' . $e->getMessage());
+        }
     }
+
 
 
 

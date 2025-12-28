@@ -118,19 +118,19 @@
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-check" :href="route('purchase-reports')"
                     :current="request()->routeIs('purchase-reports')" wire:navigate>
-                    Laporan Stok Masuk
+                    Stok Masuk
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-check" :href="route('sale-reports')"
                     :current="request()->routeIs('sale-reports')" wire:navigate>
-                    Laporan Stok Keluar
+                    Stok Keluar
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-check" :href="route('purchase-return-reports')"
                     :current="request()->routeIs('purchase-return-reports')" wire:navigate>
-                    Laporan Retur Stok Masuk
+                    Retur Stok Masuk
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-check" :href="route('sales-return-reports')"
                     :current="request()->routeIs('sales-return-reports')" wire:navigate>
-                    Laporan Retur Stok Keluar
+                    Retur Stok Keluar
                 </flux:navlist.item>
             </flux:sidebar.group>
             @endcan

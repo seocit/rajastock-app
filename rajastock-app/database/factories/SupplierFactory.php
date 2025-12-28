@@ -4,27 +4,28 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Supplier>
- */
 class SupplierFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     protected $model = \App\Models\Supplier::class;
 
-    public function definition()
+    public function definition(): array
     {
+        $suppliers = [
+            ['name' => 'PT Sumber Aki Nasional',        'address' => 'Jl. Industri No. 12, Jakarta',   'phone' => '021-555-0101'],
+            ['name' => 'PT Astra Otoparts Distribution','address' => 'Jl. Raya Cakung No. 88, Jakarta','phone' => '021-555-0202'],
+            ['name' => 'CV Prima Battery Indonesia',   'address' => 'Jl. Pabrik No. 5, Bekasi',      'phone' => '021-555-0303'],
+            ['name' => 'PT Indo Battery Sejahtera',    'address' => 'Jl. Pergudangan No. 21, Tangerang','phone' => '021-555-0404'],
+            ['name' => 'CV Jaya Power Accu',           'address' => 'Jl. Gudang No. 9, Depok',       'phone' => '021-555-0505'],
+        ];
+
+        $pick = $this->faker->randomElement($suppliers);
+
         return [
             'supplier_code' => $this->faker->unique()->bothify('SUP-####'),
-            'supplier_name' => $this->faker->company(),
-            'address'        => $this->faker->address(),
-            'no_contact'       => $this->faker->phoneNumber(),
+            'supplier_name' => $pick['name'],
+            'address'       => $pick['address'],
+            'no_contact'    => $pick['phone'],
             'email'         => $this->faker->unique()->safeEmail(),
-
         ];
     }
 }

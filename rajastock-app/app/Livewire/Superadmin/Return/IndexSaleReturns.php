@@ -4,6 +4,7 @@ namespace App\Livewire\Superadmin\Return;
 
 use App\Models\SalesReturn;
 use Flux\Flux;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -135,11 +136,56 @@ class IndexSaleReturns extends Component
             return;
         }
 
-        $return = SalesReturn::findOrFail($id);
-        $return->status = $newStatus;
-        $return->save();
+        DB::beginTransaction();
+        try {
+            $return = SalesReturn::with('details.salesDetail.item')
+                ->lockForUpdate()
+                ->findOrFail($id);
 
-        $this->dispatch('toast', type: 'success', message: 'Status berhasil diperbarui.');
+            $oldStatus = $return->status;
+
+            if ($oldStatus === $newStatus) {
+                DB::rollBack();
+                $this->dispatch('toast', type: 'info', message: 'Status tidak berubah.');
+                return;
+            }
+
+            // pending/rejected -> approved : tambah stok
+            if ($oldStatus !== 'approved' && $newStatus === 'approved') {
+                foreach ($return->details as $detail) {
+                    $item = $detail->salesDetail?->item;
+                    if ($item) {
+                        $item->increment('stock', $detail->quantity_returned);
+                    }
+                }
+            }
+
+            // approved -> pending/rejected : revert stok (kurangi)
+            if ($oldStatus === 'approved' && $newStatus !== 'approved') {
+                foreach ($return->details as $detail) {
+                    $item = $detail->salesDetail?->item;
+                    if ($item) {
+                        if ($item->stock < $detail->quantity_returned) {
+                            DB::rollBack();
+                            $this->dispatch('toast', type: 'error', message: "Stok tidak cukup untuk revert item {$item->item_name}.");
+                            return;
+                        }
+                        $item->decrement('stock', $detail->quantity_returned);
+                    }
+                }
+            }
+
+            $return->status = $newStatus;
+            $return->save();
+
+            DB::commit();
+
+            $this->dispatch('toast', type: 'success', message: 'Status berhasil diperbarui.');
+            $this->dispatch('refreshSaleReturnList');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $this->dispatch('toast', type: 'error', message: 'Gagal update status: ' . $e->getMessage());
+        }
     }
 
 

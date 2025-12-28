@@ -84,7 +84,7 @@
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $loop->index + 1 }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $return->return_number }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600">{{ $return->purchase->purchase_code }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-600">{{ $return->return_date }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-600">{{ \Carbon\Carbon::parse($return->return_date)->format('d M Y') }}</td>
                         {{-- Status dropdown --}}
                         <td class="px-4 py-2 text-sm text-gray-600">
                             <flux:dropdown>
